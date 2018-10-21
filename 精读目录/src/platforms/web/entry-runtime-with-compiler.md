@@ -2,7 +2,7 @@
 
 #### 给 Vue.compile 赋值
 
-#### 给$mount方法，在 原有功能基础上 加了编译模版（template）的功能，Vue.prototype.$mount = function(el){...}
+#### 给$mount方法，在 原有功能基础上 加了编译模版（template）的功能，即 resolve template/el and convert to render function。注：在没有设置 render 属性的时候
 
 ```
 import { warn, cached } from 'core/util/index'
@@ -28,37 +28,40 @@ const idToTemplate = cached(id => {
 （2）字符串，如：`<App />`，即 用字符串表示的具体的 html 结构
 
 ```
-if (template) {
-  if (typeof template === 'string') {
-  
-  // 是字符串，是不是以 id 表示，是的话获取 html 元素
-  
-    if (template.charAt(0) === '#') {
-      template = idToTemplate(template)
-      /* istanbul ignore if */
-      if (process.env.NODE_ENV !== 'production' && !template) {
-        warn(
-          `Template element not found or is empty: ${options.template}`,
-          thi
-        )
+if (!options.render) {
+  let template = options.template
+  if (template) {
+    if (typeof template === 'string') {
+
+    // 是字符串，是不是以 id 表示，是的话获取 html 元素
+
+      if (template.charAt(0) === '#') {
+        template = idToTemplate(template)
+        /* istanbul ignore if */
+        if (process.env.NODE_ENV !== 'production' && !template) {
+          warn(
+            `Template element not found or is empty: ${options.template}`,
+            thi
+          )
+        }
       }
+    } else if (template.nodeType) {
+
+    // 是html节点，获取节点内元素
+
+      template = template.innerHTML
+    } else {
+      if (process.env.NODE_ENV !== 'production') {
+        warn('invalid template option:' + template, this)
+      }
+      return this
     }
-  } else if (template.nodeType) {
-  
-  // 是html节点，获取节点内元素
-  
-    template = template.innerHTML
-  } else {
-    if (process.env.NODE_ENV !== 'production') {
-      warn('invalid template option:' + template, this)
-    }
-    return this
+  } else if (el) {
+
+  // 没有设置 template ，获取 $mount 方法的入参 el 的 html 元素，赋值给 template
+
+    template = getOuterHTML(el)
   }
-} else if (el) {
-
-// 没有设置 template ，获取 $mount 方法的入参 el 的 html 元素，赋值给 template
-
-  template = getOuterHTML(el)
 }
 ```
 

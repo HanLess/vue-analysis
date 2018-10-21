@@ -13,7 +13,7 @@ const idToTemplate = cached(id => {
   return el && el.innerHTML
 })
 ```
-获取容器元素的方法。
+获取容器元素的方法。<a href = "https://github.com/HanLess/vue-analysis/blob/master/%E7%B2%BE%E8%AF%BB%E7%9B%AE%E5%BD%95/src/platforms/web/util/index.md"> query </a>
 
 ```
 接下来给$mount方法，在 原有功能基础上 加了编译模版（template）的功能，Vue.prototype.$mount = function(el){...}

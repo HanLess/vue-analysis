@@ -72,6 +72,8 @@ if (template) {
 
 <a href="https://github.com/HanLess/vue-analysis/blob/master/%E7%B2%BE%E8%AF%BB%E7%9B%AE%E5%BD%95/src/platforms/web/compiler/index.md">compileToFunctions</a>
 
+shouldDecodeNewlines 和 shouldDecodeNewlinesForHref 是两个布尔值，用来表示是否需要把 html 元素中 属性的值的换行符（\n）转码成 “&#10;”
+
 <a href="https://github.com/HanLess/vue-analysis/blob/master/%E7%B2%BE%E8%AF%BB%E7%9B%AE%E5%BD%95/src/platforms/web/util/compat.md">shouldDecodeNewlines</a>
 
 <a href="https://github.com/HanLess/vue-analysis/blob/master/%E7%B2%BE%E8%AF%BB%E7%9B%AE%E5%BD%95/src/platforms/web/util/compat.md">shouldDecodeNewlinesForHref</a>

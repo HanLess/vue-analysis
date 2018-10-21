@@ -21,26 +21,32 @@ const idToTemplate = cached(id => {
 
 主要操作判断条件是 template，let template = options.template
 
-判断一：
+### 步骤一：
+
+如果满足条件，优先将 template（渲染模版） 设为 html 元素，经过第一个 if 后，template 有两种情况：
+（1）html 元素
+（2）字符串，如：`<App />`，即 用字符串表示的具体的 html 结构
 
 ```
-/*
-如果满足条件，优先将 template 设为 html 元素
-*/
-
 if (template) {
   if (typeof template === 'string') {
+  
+  // 是字符串，是不是以 id 表示，是的话获取 html 元素
+  
     if (template.charAt(0) === '#') {
       template = idToTemplate(template)
       /* istanbul ignore if */
       if (process.env.NODE_ENV !== 'production' && !template) {
         warn(
           `Template element not found or is empty: ${options.template}`,
-          this
+          thi
         )
       }
     }
   } else if (template.nodeType) {
+  
+  // 是html节点，获取节点内元素
+  
     template = template.innerHTML
   } else {
     if (process.env.NODE_ENV !== 'production') {
@@ -49,15 +55,23 @@ if (template) {
     return this
   }
 } else if (el) {
+
+// 没有设置 template ，获取 $mount 方法的入参 el 的 html 元素，赋值给 template
+
   template = getOuterHTML(el)
 }
 ```
 
-判断二：
+### 步骤二：
+
+在第二个 if 中，做了两件事：
+（1）如果满足条件，计时，知识点，windown.mark 与 window.measure 配合应用，打点计时
+（2）执行 compileToFunctions 方法，将 template 编译成 render 函数。
 
 ```
 if (template) {
   /* istanbul ignore if */
+  // 计时，开始编译
   if (process.env.NODE_ENV !== 'production' && config.performance && mark) {
     mark('compile')
   }
@@ -72,9 +86,20 @@ if (template) {
   options.staticRenderFns = staticRenderFns
 
   /* istanbul ignore if */
+  // 计时，编译结束
   if (process.env.NODE_ENV !== 'production' && config.performance && mark) {
     mark('compile end')
     measure(`vue ${this._name} compile`, 'compile', 'compile end')
   }
 }
 ```
+### 步骤三：
+
+最终return的是Component，可见 mount 最后生成一个 Component，而 new Vue()，也是生成一个 Component
+
+```
+return mount.call(this, el, hydrating)
+```
+
+
+

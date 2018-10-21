@@ -70,6 +70,12 @@ if (template) {
 
 <a href="https://github.com/HanLess/vue-analysis/blob/master/%E7%B2%BE%E8%AF%BB%E7%9B%AE%E5%BD%95/src/core/util/pref.md"> mark方法 </a>
 
+<a href="https://github.com/HanLess/vue-analysis/blob/master/%E7%B2%BE%E8%AF%BB%E7%9B%AE%E5%BD%95/src/platforms/web/compiler/index.md">compileToFunctions</a>
+
+<a href="https://github.com/HanLess/vue-analysis/blob/master/%E7%B2%BE%E8%AF%BB%E7%9B%AE%E5%BD%95/src/platforms/web/util/compat.md">shouldDecodeNewlines</a>
+
+<a href="https://github.com/HanLess/vue-analysis/blob/master/%E7%B2%BE%E8%AF%BB%E7%9B%AE%E5%BD%95/src/platforms/web/util/compat.md">shouldDecodeNewlinesForHref</a>
+
 ```
 if (template) {
   /* istanbul ignore if */

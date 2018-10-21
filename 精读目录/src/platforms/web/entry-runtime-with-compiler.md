@@ -68,7 +68,7 @@ if (template) {
 （1）如果满足条件，计时，知识点，windown.mark 与 window.measure 配合应用，打点计时
 （2）执行 compileToFunctions 方法，将 template 编译成 render 函数。
 
-<a href="https://github.com/HanLess/vue-analysis/blob/master/%E7%B2%BE%E8%AF%BB%E7%9B%AE%E5%BD%95/src/core/util/pref.md"> mark方法 </a>
+<a href="https://github.com/HanLess/vue-analysis/blob/master/%E7%B2%BE%E8%AF%BB%E7%9B%AE%E5%BD%95/src/core/util/perf.md"> mark方法 </a>
 
 <a href="https://github.com/HanLess/vue-analysis/blob/master/%E7%B2%BE%E8%AF%BB%E7%9B%AE%E5%BD%95/src/platforms/web/compiler/index.md">compileToFunctions</a>
 

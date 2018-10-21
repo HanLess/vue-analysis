@@ -2,7 +2,7 @@
 
 #### 生成 Vue.compile 方法
 
-#### 生成 render 函数。具体过程：给$mount方法，在 原有功能基础上 加了编译模版（template）的功能，即 resolve template/el and convert to render function。注：在没有显示设置render的时候
+#### 给$mount方法，在 原有功能基础上 加了编译模版（template）的功能，最终生成 render 函数，即 resolve template/el and convert to render function。注：在没有显示设置render的时候
 
 ```
 import { warn, cached } from 'core/util/index'

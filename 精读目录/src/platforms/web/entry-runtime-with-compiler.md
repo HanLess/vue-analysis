@@ -13,7 +13,7 @@ const idToTemplate = cached(id => {
   return el && el.innerHTML
 })
 ```
-获取容器元素的方法。
+获取容器元素的方法。<a href = "https://github.com/HanLess/vue-analysis/blob/master/%E7%B2%BE%E8%AF%BB%E7%9B%AE%E5%BD%95/src/platforms/web/util/index.md"> query方法 </a>
 
 ```
 接下来给$mount方法，在 原有功能基础上 加了编译模版（template）的功能，Vue.prototype.$mount = function(el){...}
@@ -67,6 +67,8 @@ if (template) {
 在第二个 if 中，做了两件事：
 （1）如果满足条件，计时，知识点，windown.mark 与 window.measure 配合应用，打点计时
 （2）执行 compileToFunctions 方法，将 template 编译成 render 函数。
+
+<a href="https://github.com/HanLess/vue-analysis/blob/master/%E7%B2%BE%E8%AF%BB%E7%9B%AE%E5%BD%95/src/core/util/pref.md"> mark方法 </a>
 
 ```
 if (template) {

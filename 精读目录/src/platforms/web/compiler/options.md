@@ -26,6 +26,12 @@ directives = {
   html
 }
 ```
+<a href=""> model </a>
+
+<a href=""> text </a>
+
+<a href=""> html </a>
+
 
 ```
 isPreTag = (tag: ?string): boolean => tag === 'pre'

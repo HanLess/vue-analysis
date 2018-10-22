@@ -1,1 +1,1 @@
-分析项目结构，从 <a href = "https://github.com/HanLess/vue-analysis/blob/master/%E7%B2%BE%E8%AF%BB%E7%9B%AE%E5%BD%95/src/platforms/web/entry-runtime-with-compiler.md">/platforms/web/entry-runtime-with-compiler.js</a> 开始，此js是rollup打包的入口文件。
+

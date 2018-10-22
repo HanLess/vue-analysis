@@ -15,9 +15,17 @@ export const baseOptions: CompilerOptions = {
 }
 ```
 
+modules：Array<ModuleOptions>
+  
+platform specific modules; e.g. style; class  
+
 ```
 modules = [  klass,  style,  model  ]
 ```
+
+directives：{ [key: string]: Function }
+
+platform specific directives
 
 ```
 directives = {
@@ -26,12 +34,6 @@ directives = {
   html
 }
 ```
-<a href=""> model </a>
-
-<a href=""> text </a>
-
-<a href=""> html </a>
-
 
 ```
 isPreTag = (tag: ?string): boolean => tag === 'pre'
@@ -47,7 +49,7 @@ isUnaryTag = makeMap(
 ```
 
 ```
-// 用途暂时不明
+// check if an attribute should be bound as a property
 
 const acceptValue = makeMap('input,textarea,option,select,progress')
 mustUseProp = (tag: string, type: ?string, attr: string): boolean => {

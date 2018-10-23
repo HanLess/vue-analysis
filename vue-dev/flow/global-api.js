@@ -1,3 +1,10 @@
+/* 
+analysised 2018-10-23
+
+Vue实现的接口，从这里可以看到vue的轮廓
+
+*/
+
 declare interface GlobalAPI {
   cid: number;
   options: Object;

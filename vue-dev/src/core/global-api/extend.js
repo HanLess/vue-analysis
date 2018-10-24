@@ -18,6 +18,9 @@ export function initExtend (Vue: GlobalAPI) {
    */
   Vue.extend = function (extendOptions: Object): Function {
     extendOptions = extendOptions || {}
+
+    // 静态方法里用 this ，不太合适，但js里，静态方法里的this指向此构造函数，这里是 Vue
+
     const Super = this
     const SuperId = Super.cid
     const cachedCtors = extendOptions._Ctor || (extendOptions._Ctor = {})

@@ -2,6 +2,13 @@ import type { Config } from '../src/core/config'
 import type VNode from '../src/core/vdom/vnode'
 import type Watcher from '../src/core/observer/watcher'
 
+/**
+ * analysised!!
+ * Vue 详细接口
+ * 
+ */
+
+
 declare interface Component {
   // constructor information
   static cid: number;

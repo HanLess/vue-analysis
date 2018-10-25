@@ -102,6 +102,7 @@ function initProps (vm: Component, propsOptions: Object) {
     // static props are already proxied on the component's prototype
     // during Vue.extend(). We only need to proxy props defined at
     // instantiation here.
+    // 这里把props数据放入实例中
     if (!(key in vm)) {
       proxy(vm, `_props`, key)
     }
@@ -148,6 +149,7 @@ function initData (vm: Component) {
     }
   }
   // observe data
+  // analysising!!
   observe(data, true /* asRootData */)
 }
 

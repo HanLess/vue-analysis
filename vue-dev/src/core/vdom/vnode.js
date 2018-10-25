@@ -1,5 +1,11 @@
 /* @flow */
 
+/**
+ * to analysis!! 
+ * 
+ * 
+ */
+
 export default class VNode {
   tag: string | void;
   data: VNodeData | void;

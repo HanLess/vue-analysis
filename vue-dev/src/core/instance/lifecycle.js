@@ -21,6 +21,10 @@ import {
 export let activeInstance: any = null
 export let isUpdatingChildComponent: boolean = false
 
+/**
+ * 
+ * 初始化了一些实例属性
+ */
 export function initLifecycle (vm: Component) {
   const options = vm.$options
 

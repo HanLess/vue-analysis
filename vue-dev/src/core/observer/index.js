@@ -38,7 +38,7 @@ export class Observer {
   value: any;
   dep: Dep;
   vmCount: number; // number of vms that has this object as root $data
-
+// analysising!!
   constructor (value: any) {
     this.value = value
     this.dep = new Dep()

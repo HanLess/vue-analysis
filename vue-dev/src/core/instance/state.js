@@ -149,7 +149,6 @@ function initData (vm: Component) {
     }
   }
   // observe data
-  // analysising!!
   observe(data, true /* asRootData */)
 }
 

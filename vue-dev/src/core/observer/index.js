@@ -38,7 +38,6 @@ export class Observer {
   value: any;
   dep: Dep;
   vmCount: number; // number of vms that has this object as root $data
-// analysising!!
   constructor (value: any) {
     this.value = value
     this.dep = new Dep()
@@ -63,6 +62,7 @@ export class Observer {
   walk (obj: Object) {
     const keys = Object.keys(obj)
     for (let i = 0; i < keys.length; i++) {
+      // analysised 2018-10-28
       defineReactive(obj, keys[i])
     }
   }
@@ -130,6 +130,8 @@ export function observe (value: any, asRootData: ?boolean): Observer | void {
 
 /**
  * Define a reactive property on an Object.
+ * 
+ * 重点，这里为data里每一个属性跑一遍 defineReactive，即为每一个属性（数据）创建一个闭包
  */
 export function defineReactive (
   obj: Object,
@@ -158,6 +160,7 @@ export function defineReactive (
     configurable: true,
     get: function reactiveGetter () {
       const value = getter ? getter.call(obj) : val
+      // analysising!! dep 和 watcher 的关系
       if (Dep.target) {
         dep.depend()
         if (childOb) {

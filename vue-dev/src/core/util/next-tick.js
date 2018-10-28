@@ -86,7 +86,7 @@ export function withMacroTask (fn: Function): Function {
     return res
   })
 }
-
+// analysising
 export function nextTick (cb?: Function, ctx?: Object) {
   let _resolve
   callbacks.push(() => {

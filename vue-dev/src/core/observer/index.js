@@ -132,6 +132,11 @@ export function observe (value: any, asRootData: ?boolean): Observer | void {
  * Define a reactive property on an Object.
  * 
  * 重点，这里为data里每一个属性跑一遍 defineReactive，即为每一个属性（数据）创建一个闭包
+ * 
+ * 在闭包中，维护一个 dep = new Dep() 对象
+ * 
+ * dep与watcher组成监听模式，在get方法中，dep里维护一个watcher数组（subs），当data中的数据有变化，触发set方法，
+ * dep通知subs中的watcher重新计算，渲染，呈现在dom中
  */
 export function defineReactive (
   obj: Object,
@@ -160,7 +165,6 @@ export function defineReactive (
     configurable: true,
     get: function reactiveGetter () {
       const value = getter ? getter.call(obj) : val
-      // analysising!! dep 和 watcher 的关系
       if (Dep.target) {
         dep.depend()
         if (childOb) {

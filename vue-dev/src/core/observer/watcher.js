@@ -18,10 +18,17 @@ import type { SimpleSet } from '../util/index'
 let uid = 0
 
 /**
- * analysising!!
  * A watcher parses an expression, collects dependencies,
  * and fires callback when the expression value changes.
  * This is used for both the $watch() api and directives.
+ * 
+ * 
+ * 没个组件默认会维护一个 watcher，属性名 _watcher , _watchers
+ * 当显式地调用 $watch 方法后，会在 _watchers 推入一个新的watcher对象
+ * 当data中的数据触发get方法时（被使用，包括在指令中或其他方法中），会把相关的 watcher对象
+ * 都push进闭包中的dep.subs中。
+ * 
+ * 当data中的数据触发set方法（改变）时，会触发dep.subs中的watcher对象全都 update ，重新计算，渲染dom
  */
 export default class Watcher {
   vm: Component;

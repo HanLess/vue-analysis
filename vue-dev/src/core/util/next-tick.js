@@ -86,7 +86,11 @@ export function withMacroTask (fn: Function): Function {
     return res
   })
 }
-// analysising
+
+/**
+ * nextTick 把刷新页面、数据的事件放进 micro 或 macro 中，防止阻塞
+ * 
+ */
 export function nextTick (cb?: Function, ctx?: Object) {
   let _resolve
   callbacks.push(() => {

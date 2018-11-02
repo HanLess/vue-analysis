@@ -39,14 +39,19 @@ function flushSchedulerQueue () {
   flushing = true
   let watcher, id
 
+  /**
   // Sort queue before flush.
   // This ensures that:
   // 1. Components are updated from parent to child. (because parent is always
   //    created before the child)
+     1、 父组件比子组件先刷新
   // 2. A component's user watchers are run before its render watcher (because
   //    user watchers are created before the render watcher)
+      2、组件自定义的watcher.run 要先于默认 watcher.run 执行
+
   // 3. If a component is destroyed during a parent component's watcher run,
   //    its watchers can be skipped.
+   */
   queue.sort((a, b) => a.id - b.id)
 
   // do not cache length because more watchers might be pushed
@@ -126,6 +131,9 @@ function callActivatedHooks (queue) {
  * Push a watcher into the watcher queue.
  * Jobs with duplicate IDs will be skipped unless it's
  * pushed when the queue is being flushed.
+ * 
+ * 
+ * 使用 nextTick 来执行数据的更新，页面的刷新，microTask 防止阻塞线程
  */
 export function queueWatcher (watcher: Watcher) {
   const id = watcher.id

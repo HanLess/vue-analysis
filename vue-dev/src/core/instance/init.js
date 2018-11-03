@@ -51,8 +51,8 @@ export function initMixin (Vue: Class<Component>) {
     // 初始化实例相关属性
     vm._self = vm
     initLifecycle(vm)
-    initEvents(vm)
-    initRender(vm)
+    initEvents(vm) // 监听自定义事件
+    initRender(vm) // 定义 $createElement 方法，render的主体方法
     callHook(vm, 'beforeCreate')
     initInjections(vm) // resolve injections before data/props
     initState(vm)  // 初始化数据，data，methods，props，computed，watch
@@ -66,6 +66,7 @@ export function initMixin (Vue: Class<Component>) {
       measure(`vue ${vm._name} init`, startTag, endTag)
     }
 
+    // 如果创建Vue实例的时候指定了el参数，执行 $mount
     if (vm.$options.el) {
       vm.$mount(vm.$options.el)
     }

@@ -9,11 +9,14 @@ import {
 } from '../util/index'
 import { updateListeners } from '../vdom/helpers/index'
 
+/**
+ * 用来初始化自定义的事件，$on $onece 绑定的
+ */
+
 export function initEvents (vm: Component) {
   vm._events = Object.create(null)
   vm._hasHookEvent = false
   // init parent attached events
-  // to analysis!!!
   const listeners = vm.$options._parentListeners
   if (listeners) {
     updateComponentListeners(vm, listeners)
@@ -43,6 +46,11 @@ export function updateComponentListeners (
   updateListeners(listeners, oldListeners || {}, add, remove, vm)
   target = undefined
 }
+
+/**
+ * 
+ * 这里的 $on $once 绑定监听事件，只能监听本组件中 emit 的事件，无法监听子组件
+ */
 
 export function eventsMixin (Vue: Class<Component>) {
   const hookRE = /^hook:/

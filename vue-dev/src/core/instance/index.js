@@ -15,7 +15,7 @@ function Vue (options) {
 }
 
 initMixin(Vue)  // 此阶段执行 beforeCreate，created
-stateMixin(Vue)
+stateMixin(Vue) // analysising !!
 eventsMixin(Vue)
 lifecycleMixin(Vue)
 renderMixin(Vue)

@@ -17,6 +17,8 @@ const genStaticKeysCached = cached(genStaticKeys)
  * 1. Hoist them into constants, so that we no longer need to
  *    create fresh nodes for them on each re-render;
  * 2. Completely skip them in the patching process.
+ * 
+ * 遍历 AST 树中的子树（子组件），同时参与到生成 render方法中，防止每次刷新dom时都需要生成dom节点
  */
 export function optimize (root: ?ASTElement, options: CompilerOptions) {
   if (!root) return

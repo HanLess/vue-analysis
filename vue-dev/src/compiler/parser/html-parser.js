@@ -67,8 +67,10 @@ export function parseHTML (html, options) {
     // Make sure we're not in a plaintext content element like script/style
     if (!lastTag || !isPlainTextElement(lastTag)) {
       let textEnd = html.indexOf('<')
+      // 这里会排除一些无用的内容
       if (textEnd === 0) {
         // Comment:
+        // 注释行
         if (comment.test(html)) {
           const commentEnd = html.indexOf('-->')
 
@@ -82,6 +84,7 @@ export function parseHTML (html, options) {
         }
 
         // http://en.wikipedia.org/wiki/Conditional_comment#Downlevel-revealed_conditional_comment
+        // 还是注释
         if (conditionalComment.test(html)) {
           const conditionalEnd = html.indexOf(']>')
 
@@ -108,6 +111,7 @@ export function parseHTML (html, options) {
         }
 
         // Start tag:
+        // analysising
         const startTagMatch = parseStartTag()
         if (startTagMatch) {
           handleStartTag(startTagMatch)

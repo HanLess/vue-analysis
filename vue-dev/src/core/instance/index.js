@@ -15,9 +15,9 @@ function Vue (options) {
 }
 
 initMixin(Vue)  // 此阶段执行 beforeCreate，created
-stateMixin(Vue) // analysising !!
-eventsMixin(Vue)
-lifecycleMixin(Vue)
-renderMixin(Vue)
+stateMixin(Vue) // 设置了 $data $props $watcher
+eventsMixin(Vue) // 设置了 $on $emit $once $off ，监听、发送自定义事件
+lifecycleMixin(Vue) // 设置了 $destroy $forceUpdate ，强制执行方法
+renderMixin(Vue) // 设置了 $nextTick , _render 方法，dom事件触发的回调会使用 macroTask 执行
 
 export default Vue

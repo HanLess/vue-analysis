@@ -13,6 +13,8 @@ export const createCompiler = createCompilerCreator(function baseCompile (
   template: string,
   options: CompilerOptions
 ): CompiledResult {
+
+  // 把 template 转换成 AST 结构的数据  
   const ast = parse(template.trim(), options)
   if (options.optimize !== false) {
     optimize(ast, options)

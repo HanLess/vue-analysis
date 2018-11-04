@@ -38,6 +38,11 @@ function createOnceHandler (handler, event, capture) {
   }
 }
 
+/***
+ * 
+ * 通过指令（v-on v-once ）绑定的dom事件，默认是 macroTask
+ */
+
 function add (
   event: string,
   handler: Function,

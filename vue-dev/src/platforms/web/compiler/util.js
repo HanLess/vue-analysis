@@ -2,6 +2,7 @@
 
 import { makeMap } from 'shared/util'
 
+// 单标签元素 ，即 <hr /> <img />
 export const isUnaryTag = makeMap(
   'area,base,br,col,embed,frame,hr,img,input,isindex,keygen,' +
   'link,meta,param,source,track,wbr'

@@ -17,10 +17,10 @@ const attribute = /^\s*([^\s"'<>\/=]+)(?:\s*(=)\s*(?:"([^"]*)"+|'([^']*)'+|([^\s
 // could use https://www.w3.org/TR/1999/REC-xml-names-19990114/#NT-QName
 // but for Vue templates we can enforce a simple charset
 const ncname = '[a-zA-Z_][\\w\\-\\.]*'
-const qnameCapture = `((?:${ncname}\\:)?${ncname})`
+const qnameCapture = `((?:${ncname}\\:)?${ncname})`   // html 标签
 const startTagOpen = new RegExp(`^<${qnameCapture}`)
-const startTagClose = /^\s*(\/?)>/
-const endTag = new RegExp(`^<\\/${qnameCapture}[^>]*>`)
+const startTagClose = /^\s*(\/?)>/  // 如 ' />' ' >'
+const endTag = new RegExp(`^<\\/${qnameCapture}[^>]*>`)   // 如 </div>
 const doctype = /^<!DOCTYPE [^>]+>/i
 // #7298: escape - to avoid being pased as HTML comment when inlined in page
 const comment = /^<!\--/
@@ -57,9 +57,9 @@ function decodeAttr (value, shouldDecodeNewlines) {
 
 export function parseHTML (html, options) {
   const stack = []
-  const expectHTML = options.expectHTML
-  const isUnaryTag = options.isUnaryTag || no
-  const canBeLeftOpenTag = options.canBeLeftOpenTag || no
+  const expectHTML = options.expectHTML // true
+  const isUnaryTag = options.isUnaryTag || no // 是否是但元素标签，如<img />, <br />
+  const canBeLeftOpenTag = options.canBeLeftOpenTag || no // 是否是特殊标签，可以不封闭，如 <p>
   let index = 0
   let last, lastTag
   while (html) {
@@ -111,7 +111,6 @@ export function parseHTML (html, options) {
         }
 
         // Start tag:
-        // analysising
         const startTagMatch = parseStartTag()
         if (startTagMatch) {
           handleStartTag(startTagMatch)
@@ -185,11 +184,33 @@ export function parseHTML (html, options) {
   // Clean up any remaining tags
   parseEndTag()
 
+ /**
+  * 
+  * 分段分析输入的html文本，前进，跨过匹配到的字符串，如：<div>hello world</div>，匹配到 ‘<div’ ，
+  * 则分割后 html = ‘>hello world</div>’
+  * index = index + 4
+  *  *// 
   function advance (n) {
     index += n
     html = html.substring(n)
   }
 
+    /**
+     * 分析开始标签，如 html = `<div class='gg'>hello world</div>`
+     * 
+     * 这里的开始标签是 <div class='gg'>
+     * 
+     * return match = {
+     *                  tagName:div,
+                        attrs: [],   // attrs 是 html.match(attribute) 到的class=‘gg’ 数组
+                        start: 0, // 0，start = html.match(startTagOpen)，一般情况下都是0
+                        unarySlash : '', // 即开始标签的封闭符，这里是空字符串，<App /> 这里就是 ／
+                        end : 16, // 16，即开始标签的长度
+                     }
+
+      html = hello world</div>，即开始标签被截掉了
+      index = 16，即跨过的开始标签的长度
+     */
   function parseStartTag () {
     const start = html.match(startTagOpen)
     if (start) {

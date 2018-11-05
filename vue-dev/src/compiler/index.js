@@ -17,8 +17,10 @@ export const createCompiler = createCompilerCreator(function baseCompile (
   // 把 template 转换成 AST 结构的数据  
   const ast = parse(template.trim(), options)
   if (options.optimize !== false) {
+    // 这里给 ast 增加了 static 和 staticRoot 两个属性
     optimize(ast, options)
   }
+  // analysising
   const code = generate(ast, options)
   return {
     ast,

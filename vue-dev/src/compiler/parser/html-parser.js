@@ -233,7 +233,8 @@ export function parseHTML (html, options) {
       }
     }
   }
-
+  
+  // 对于非一元标签，推入 stack 中，并处理attr属性
   function handleStartTag (match) {
     const tagName = match.tagName
     const unarySlash = match.unarySlash
@@ -250,6 +251,7 @@ export function parseHTML (html, options) {
     // 判断是否是一元标签
     const unary = isUnaryTag(tagName) || !!unarySlash
 
+    // 对 attr 做一些处理
     const l = match.attrs.length
     const attrs = new Array(l)
     for (let i = 0; i < l; i++) {
@@ -302,6 +304,7 @@ export function parseHTML (html, options) {
       pos = 0
     }
 
+    // 有匹配的闭合标签
     if (pos >= 0) {
       // Close all the open elements, up the stack
       for (let i = stack.length - 1; i >= pos; i--) {
@@ -313,12 +316,15 @@ export function parseHTML (html, options) {
             `tag <${stack[i].tag}> has no matching end tag.`
           )
         }
+        // 执行end方法
+        // analysising
         if (options.end) {
           options.end(stack[i].tag, start, end)
         }
       }
 
       // Remove the open elements from the stack
+      // 将此标签从stack中出栈
       stack.length = pos
       lastTag = pos && stack[pos - 1].tag
     } else if (lowerCasedTagName === 'br') {

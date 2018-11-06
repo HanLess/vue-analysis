@@ -161,6 +161,7 @@ export function parse (
         processRawAttrs(element)
       } else if (!element.processed) {
         // structural directives
+        // 解析 指令
         processFor(element)
         processIf(element)
         processOnce(element)
@@ -187,6 +188,7 @@ export function parse (
 
       // tree management
       if (!root) {
+        // root 节点
         root = element
         checkRootConstraints(root)
       } else if (!stack.length) {
@@ -213,12 +215,17 @@ export function parse (
           const name = element.slotTarget || '"default"'
           ;(currentParent.scopedSlots || (currentParent.scopedSlots = {}))[name] = element
         } else {
+          /**
+           * 判断如果有 currentParent，会把当前 AST 元素 push 到 currentParent.chilldren 中
+           * 同时把 AST 元素的 parent 指向 currentParent
+           */
           currentParent.children.push(element)
           element.parent = currentParent
         }
       }
       if (!unary) {
         currentParent = element
+        // 当前节点入栈
         stack.push(element)
       } else {
         closeElement(element)
@@ -234,6 +241,7 @@ export function parse (
       }
       // pop stack
       stack.length -= 1
+      // 把stack最后一个元素保存为 currentParent
       currentParent = stack[stack.length - 1]
       closeElement(element)
     },
@@ -353,8 +361,16 @@ function processRef (el) {
 export function processFor (el: ASTElement) {
   let exp
   if ((exp = getAndRemoveAttr(el, 'v-for'))) {
+    /* 解析 v-for 指令内容 , 以 v-for="(item,index) in data" 为例
+      res = {
+        for : 'data',
+        alias : item,
+        iterator1 : index
+      }
+    */
     const res = parseFor(exp)
     if (res) {
+      // 给 ast 添加属性
       extend(el, res)
     } else if (process.env.NODE_ENV !== 'production') {
       warn(

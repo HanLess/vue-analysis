@@ -65,6 +65,8 @@ export function parse (
   template: string,
   options: CompilerOptions
 ): ASTElement | void {
+
+  /** 针对不同平台的解析配置 start  */
   warn = options.warn || baseWarn
 
   platformIsPreTag = options.isPreTag || no
@@ -76,6 +78,8 @@ export function parse (
   postTransforms = pluckModuleFunction(options.modules, 'postTransformNode')
 
   delimiters = options.delimiters
+
+  /** 针对不同平台的解析配置 end  */
 
   const stack = []
   const preserveWhitespace = options.preserveWhitespace !== false

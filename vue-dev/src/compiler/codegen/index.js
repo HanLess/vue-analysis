@@ -42,7 +42,8 @@ export function generate (
   options: CompilerOptions
 ): CodegenResult {
   const state = new CodegenState(options)
-  const code = ast ? genElement(ast, state) : '_c("div")'
+  // 以hello-world为例，code = "_c('App')"
+  const code = ast ? genElement(ast, state) : '_c("div")'   
   return {
     render: `with(this){return ${code}}`,
     staticRenderFns: state.staticRenderFns

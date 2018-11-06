@@ -67,10 +67,9 @@ export function parseHTML (html, options) {
     // Make sure we're not in a plaintext content element like script/style
     if (!lastTag || !isPlainTextElement(lastTag)) {
       let textEnd = html.indexOf('<')
-      // 这里会排除一些无用的内容
       if (textEnd === 0) {
         // Comment:
-        // 注释行
+        // 注释行，无用，匹配到就跳过
         if (comment.test(html)) {
           const commentEnd = html.indexOf('-->')
 
@@ -84,7 +83,7 @@ export function parseHTML (html, options) {
         }
 
         // http://en.wikipedia.org/wiki/Conditional_comment#Downlevel-revealed_conditional_comment
-        // 还是注释
+        // 还是注释，无用，匹配到就跳过
         if (conditionalComment.test(html)) {
           const conditionalEnd = html.indexOf(']>')
 
@@ -95,6 +94,7 @@ export function parseHTML (html, options) {
         }
 
         // Doctype:
+        // 无用，匹配到就跳过
         const doctypeMatch = html.match(doctype)
         if (doctypeMatch) {
           advance(doctypeMatch[0].length)
@@ -196,7 +196,7 @@ export function parseHTML (html, options) {
   }
 
     /**
-     * 分析开始标签，如 html = `<div class='gg'>hello world</div>`
+     * 解析开始标签，如 html = `<div class='gg'>hello world</div>`
      * 
      * 这里的开始标签是 <div class='gg'>
      * 
@@ -247,6 +247,7 @@ export function parseHTML (html, options) {
       }
     }
 
+    // 判断是否是一元标签
     const unary = isUnaryTag(tagName) || !!unarySlash
 
     const l = match.attrs.length
@@ -269,6 +270,7 @@ export function parseHTML (html, options) {
       }
     }
 
+    // 非一元标签，stack里存一个对象（就是此入参，解析后的开始标签对象 match）
     if (!unary) {
       stack.push({ tag: tagName, lowerCasedTag: tagName.toLowerCase(), attrs: attrs })
       lastTag = tagName

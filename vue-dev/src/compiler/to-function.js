@@ -17,9 +17,10 @@ function createFunction (code, errors) {
   }
 }
 
+// 返回 compileToFunctions
 export function createCompileToFunctionFn (compile: Function): Function {
   const cache = Object.create(null)
-
+  //  这个方法返回一个对象，里面包含了render函数
   return function compileToFunctions (
     template: string,
     options?: CompilerOptions,
@@ -75,6 +76,8 @@ export function createCompileToFunctionFn (compile: Function): Function {
     // turn code into functions
     const res = {}
     const fnGenErrors = []
+
+    // render 函数在这里
     res.render = createFunction(compiled.render, fnGenErrors)
     res.staticRenderFns = compiled.staticRenderFns.map(code => {
       return createFunction(code, fnGenErrors)

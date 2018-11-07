@@ -49,7 +49,7 @@ export function createASTElement (
   parent: ASTElement | void
 ): ASTElement {
   return {
-    type: 1,
+    type: 1,    // type 默认是 1，即普通节点 , 2 或 3 是文本节点
     tag,
     attrsList: attrs,
     attrsMap: makeAttrsMap(attrs),
@@ -124,7 +124,9 @@ export function parse (
      * 
      * 把开始标签解析成一个对象，里面维护了tagName ，attrs 等信息，入栈 stack
      * 
-     * 最后调用 start
+     * 最后调用 start，
+     * 
+     * start 方法会把此开始标签转为一个 AST 对象，然后解析 attrs 中的内容，把所有属性内容赋值到这个 ast 对象上，最后 ast 对象入栈 stack
      */
     start (tag, attrs, unary) {
       // check namespace.
@@ -257,7 +259,9 @@ export function parse (
       currentParent = stack[stack.length - 1]
       closeElement(element)
     },
-
+    /**
+     * 这个方法把html中的文本内容放到上一个元素 ast 对象中，存为 children
+     */
     chars (text: string) {
       if (!currentParent) {
         if (process.env.NODE_ENV !== 'production') {
@@ -286,9 +290,24 @@ export function parse (
         ? isTextTag(currentParent) ? text : decodeHTMLCached(text)
         // only preserve whitespace if its not right after a starting tag
         : preserveWhitespace && children.length ? ' ' : ''
+
+      // 下面是 chars 方法的主要逻辑！  
       if (text) {
         let res
+        /**
+         * 文本构造的 AST 元素有 2 种类型，一种是有表达式的(有{{}}的)，type 为 2，一种是纯文本，type 为 3
+         */
         if (!inVPre && text !== ' ' && (res = parseText(text, delimiters))) {
+          // 有表达式的，这里把此文本内容推入 currentParent.children 
+          /**
+           * 
+           * expression : '_s(index)+":"+_s(item)',
+          *  tokens : [
+          *               {@binding: "index"},
+          *               ' : ',
+          *               {@binding: "item"}
+          *            ]
+           */
           children.push({
             type: 2,
             expression: res.expression,
@@ -296,6 +315,7 @@ export function parse (
             text
           })
         } else if (text !== ' ' || !children.length || children[children.length - 1].text !== ' ') {
+          // 纯文本，也推入 children
           children.push({
             type: 3,
             text

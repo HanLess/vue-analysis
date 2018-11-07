@@ -21,6 +21,7 @@ export function parseText (
   text: string,
   delimiters?: [string, string]
 ): TextParseResult | void {
+  // 分隔符，默认是 {{}}
   const tagRE = delimiters ? buildRegex(delimiters) : defaultTagRE
   if (!tagRE.test(text)) {
     return
@@ -46,6 +47,19 @@ export function parseText (
     rawTokens.push(tokenValue = text.slice(lastIndex))
     tokens.push(JSON.stringify(tokenValue))
   }
+
+  /**
+   * 经过解析，返回的对象格式如下，以 <div>{{index}} : {{item}}</div> 中的文本内容 ‘{{index}} : {{item}}’ 为例
+   * 
+   * {
+   *  expression : '_s(index)+":"+_s(item)',
+   *  tokens : [
+  *               {@binding: "index"},
+  *               ' : ',
+  *               {@binding: "item"}
+   *            ]
+   * }
+   */
   return {
     expression: tokens.join('+'),
     tokens: rawTokens

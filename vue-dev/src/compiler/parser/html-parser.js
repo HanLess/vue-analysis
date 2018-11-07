@@ -103,7 +103,6 @@ export function parseHTML (html, options) {
 
         // End tag:
         // 这里只会匹配以结束标签 开头 的 html 字符串 , 如 ' </li></ul> '
-        // analysising
         const endTagMatch = html.match(endTag)
         if (endTagMatch) {
           const curIndex = index
@@ -113,9 +112,10 @@ export function parseHTML (html, options) {
         }
 
         // Start tag:
-        // 这里会把开始标签转为一个对象并对html裁剪，具体看下面的注释，所以 startTagMatch 是一个转译后的对象
+        // 这里会把开始标签转为一个对象，并对html裁剪，具体看下面的注释，所以 startTagMatch 是一个转译后的对象
         const startTagMatch = parseStartTag()
         if (startTagMatch) {
+          // 处理携带的属性，推入stack中
           handleStartTag(startTagMatch)
           if (shouldIgnoreFirstNewline(lastTag, html)) {
             advance(1)
@@ -147,7 +147,7 @@ export function parseHTML (html, options) {
         text = html
         html = ''
       }
-
+      // 以html元素中的文本内容为入参，执行 options.chars 方法，将内容保存在 ast 对象中
       if (options.chars && text) {
         options.chars(text)
       }
@@ -295,6 +295,11 @@ export function parseHTML (html, options) {
     }
   }
 
+  /***
+   * 这个方法有两个作用：
+   * （1）以此闭合标签为入参，执行 option.end 方法
+   * （2）把闭合标签对应的开始标签，从stack中出栈
+   */
   function parseEndTag (tagName, start, end) {
     let pos, lowerCasedTagName
     if (start == null) start = index
@@ -319,6 +324,11 @@ export function parseHTML (html, options) {
     // 有匹配的闭合标签
     if (pos >= 0) {
       // Close all the open elements, up the stack
+      /**
+       * 这里为什么要循环执行 option.end 方法
+       * 
+       * 正常来说 i = pos，但一旦出错，通过循环可以保证正常执行 end 方法，而i > pos的情况也做了处理
+       */
       for (let i = stack.length - 1; i >= pos; i--) {
         if (process.env.NODE_ENV !== 'production' &&
           (i > pos || !tagName) &&

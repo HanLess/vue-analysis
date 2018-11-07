@@ -20,7 +20,7 @@ import {
 } from '../helpers'
 
 export const onRE = /^@|^v-on:/
-export const dirRE = /^v-|^@|^:/
+export const dirRE = /^v-|^@|^:/                               // 指令、绑定标识：v- , : , @
 export const forAliasRE = /([^]*?)\s+(?:in|of)\s+([^]*)/
 export const forIteratorRE = /,([^,\}\]]*)(?:,([^,\}\]]*))?$/
 const stripParensRE = /^\(|\)$/g
@@ -81,12 +81,12 @@ export function parse (
 
   /** 针对不同平台的解析配置 end  */
 
-  const stack = []
+  const stack = []  // 注意要把这个 stack 和 parseHTML 中的 stack 区分开，这里存的是 createASTElement 生成的 ASTElement 对象
   const preserveWhitespace = options.preserveWhitespace !== false
   let root
   let currentParent
-  let inVPre = false
-  let inPre = false
+  let inVPre = false    // 判断传进来的元素对象，是否使用了 v-pre 指令
+  let inPre = false     // 标签是否需要保留空格  
   let warned = false
 
   function warnOnce (msg) {
@@ -118,6 +118,14 @@ export function parse (
     shouldDecodeNewlines: options.shouldDecodeNewlines,
     shouldDecodeNewlinesForHref: options.shouldDecodeNewlinesForHref,
     shouldKeepComment: options.comments,
+
+    /**
+     * 在 parseHTML 过程中会遍历html的开始标签
+     * 
+     * 把开始标签解析成一个对象，里面维护了tagName ，attrs 等信息，入栈 stack
+     * 
+     * 最后调用 start
+     */
     start (tag, attrs, unary) {
       // check namespace.
       // inherit parent ns if there is one
@@ -147,7 +155,8 @@ export function parse (
       for (let i = 0; i < preTransforms.length; i++) {
         element = preTransforms[i](element, options) || element
       }
-
+      
+      
       if (!inVPre) {
         processPre(element)
         if (element.pre) {
@@ -157,11 +166,12 @@ export function parse (
       if (platformIsPreTag(element.tag)) {
         inPre = true
       }
+      // 这里会判断是否使用了 v-pre 指令，分别做处理
       if (inVPre) {
         processRawAttrs(element)
       } else if (!element.processed) {
         // structural directives
-        // 解析 指令
+        // 解析 指令，这里会给 element 添加相应的属性，来表示指令的内容
         processFor(element)
         processIf(element)
         processOnce(element)
@@ -188,7 +198,7 @@ export function parse (
 
       // tree management
       if (!root) {
-        // root 节点
+        // 赋值 root 节点
         root = element
         checkRootConstraints(root)
       } else if (!stack.length) {
@@ -218,6 +228,8 @@ export function parse (
           /**
            * 判断如果有 currentParent，会把当前 AST 元素 push 到 currentParent.chilldren 中
            * 同时把 AST 元素的 parent 指向 currentParent
+           * 
+           * 这一步维护了 AST 树的父子节点关系
            */
           currentParent.children.push(element)
           element.parent = currentParent
@@ -302,12 +314,17 @@ export function parse (
   return root
 }
 
+// 判断是否使用了 v-pre 指令
 function processPre (el) {
   if (getAndRemoveAttr(el, 'v-pre') != null) {
     el.pre = true
   }
 }
 
+/**
+ *对于使用了 v-pre 指令的元素，会在这里处理它其他的属性，如 style , class , v-if 等 
+ * 存在 el 对象的 attrs 属性里
+ */
 function processRawAttrs (el) {
   const l = el.attrsList.length
   if (l) {
@@ -324,6 +341,12 @@ function processRawAttrs (el) {
   }
 }
 
+/**  
+ * 处理非指令特性 ：key , ref , slot , is 等
+ * 
+ * 处理绑定指令
+ * 
+*/
 export function processElement (element: ASTElement, options: CompilerOptions) {
   processKey(element)
 
@@ -333,10 +356,12 @@ export function processElement (element: ASTElement, options: CompilerOptions) {
 
   processRef(element)
   processSlot(element)
+  // 处理动态组件
   processComponent(element)
   for (let i = 0; i < transforms.length; i++) {
     element = transforms[i](element, options) || element
   }
+  // 这里会处理绑定指令
   processAttrs(element)
 }
 
@@ -530,12 +555,17 @@ function processComponent (el) {
   }
 }
 
+/**
+ * 处理元素上使用的 绑定指令（ v-bind , v-on , : 或 @）
+ * 将内容添加到元素对象中，记录下来
+ */
 function processAttrs (el) {
   const list = el.attrsList
   let i, l, name, rawName, value, modifiers, isProp
   for (i = 0, l = list.length; i < l; i++) {
     name = rawName = list[i].name
     value = list[i].value
+    // 判断此属性是否是以下情况：指令 v- , : 或 @ 绑定
     if (dirRE.test(name)) {
       // mark element as dynamic
       el.hasBindings = true
@@ -589,6 +619,7 @@ function processAttrs (el) {
         }
       }
     } else {
+      // 不是 vue 特定属性（v- , : 或 @ 绑定）
       // literal attribute
       if (process.env.NODE_ENV !== 'production') {
         const res = parseText(value, delimiters)

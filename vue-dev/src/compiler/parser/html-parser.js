@@ -102,6 +102,8 @@ export function parseHTML (html, options) {
         }
 
         // End tag:
+        // 这里只会匹配以结束标签 开头 的 html 字符串 , 如 ' </li></ul> '
+        // analysising
         const endTagMatch = html.match(endTag)
         if (endTagMatch) {
           const curIndex = index
@@ -111,6 +113,7 @@ export function parseHTML (html, options) {
         }
 
         // Start tag:
+        // 这里会把开始标签转为一个对象并对html裁剪，具体看下面的注释，所以 startTagMatch 是一个转译后的对象
         const startTagMatch = parseStartTag()
         if (startTagMatch) {
           handleStartTag(startTagMatch)
@@ -219,14 +222,23 @@ export function parseHTML (html, options) {
         attrs: [],
         start: index
       }
+      // 第一次裁剪 html ， '<div '
       advance(start[0].length)
       let end, attr
+      /**
+       * 这个循环里，会匹配开始标签里的属性
+       * class , :class , v-if , v-for 等
+       * 
+       * 并在每次循环里一次对html 裁剪
+       */
       while (!(end = html.match(startTagClose)) && (attr = html.match(attribute))) {
         advance(attr[0].length)
         match.attrs.push(attr)
       }
+      // 匹配到了开始标签的尾部，' /> 或 > '
       if (end) {
         match.unarySlash = end[1]
+        // 做第三次 html 裁剪
         advance(end[0].length)
         match.end = index
         return match
@@ -234,7 +246,7 @@ export function parseHTML (html, options) {
     }
   }
   
-  // 对于非一元标签，推入 stack 中，并处理attr属性
+  // 对于非一元标签，推入 stack 中，并处理attr属性，最后执行 start 方法
   function handleStartTag (match) {
     const tagName = match.tagName
     const unarySlash = match.unarySlash
@@ -251,7 +263,7 @@ export function parseHTML (html, options) {
     // 判断是否是一元标签
     const unary = isUnaryTag(tagName) || !!unarySlash
 
-    // 对 attr 做一些处理
+    // 对 attr 做一些处理，因为传进来的是 string.match 后返回的数组，需要提取有效信息
     const l = match.attrs.length
     const attrs = new Array(l)
     for (let i = 0; i < l; i++) {
@@ -317,7 +329,6 @@ export function parseHTML (html, options) {
           )
         }
         // 执行end方法
-        // analysising
         if (options.end) {
           options.end(stack[i].tag, start, end)
         }

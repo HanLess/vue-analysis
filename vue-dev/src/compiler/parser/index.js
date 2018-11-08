@@ -245,7 +245,7 @@ export function parse (
         closeElement(element)
       }
     },
-
+    // 在 end 方法中会把stack中最后一个元素出栈
     end () {
       // remove trailing whitespace
       const element = stack[stack.length - 1]
@@ -253,7 +253,7 @@ export function parse (
       if (lastNode && lastNode.type === 3 && lastNode.text === ' ' && !inPre) {
         element.children.pop()
       }
-      // pop stack
+      // stack 中最后一个元素出栈
       stack.length -= 1
       // 把stack最后一个元素保存为 currentParent
       currentParent = stack[stack.length - 1]

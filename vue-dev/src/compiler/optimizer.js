@@ -18,15 +18,17 @@ const genStaticKeysCached = cached(genStaticKeys)
  *    create fresh nodes for them on each re-render;
  * 2. Completely skip them in the patching process.
  * 
- * 遍历 AST 树中的子树（子组件），同时参与到生成 render方法中，防止每次刷新dom时都需要生成dom节点
+ * 遍历 AST 树，找到其中的静态子树（数据不会动态变化），防止每次刷新dom时都需要生成dom节点，即在每次 render 的时候跳过他们
  */
 export function optimize (root: ?ASTElement, options: CompilerOptions) {
   if (!root) return
   isStaticKey = genStaticKeysCached(options.staticKeys || '')
   isPlatformReservedTag = options.isReservedTag || no
   // first pass: mark all non-static nodes.
+  // 给每个节点做标记，是否是静态的，用属性 static 记录
   markStatic(root)
   // second pass: mark static roots.
+  // 标记 staticRoot ，用途 ？ to analysis!!
   markStaticRoots(root, false)
 }
 
@@ -37,6 +39,7 @@ function genStaticKeys (keys: string): Function {
   )
 }
 
+// 给每个节点做标记，是否是静态的，用属性 static 记录
 function markStatic (node: ASTNode) {
   node.static = isStatic(node)
   if (node.type === 1) {
@@ -77,6 +80,10 @@ function markStaticRoots (node: ASTNode, isInFor: boolean) {
     // For a node to qualify as a static root, it should have children that
     // are not just static text. Otherwise the cost of hoisting out will
     // outweigh the benefits and it's better off to just always render it fresh.
+    /**
+     * staticRoot 判断逻辑：
+     * 此节点是静态的 && 有子节点 && 不能只有一个静态文本子节点
+     */
     if (node.static && node.children.length && !(
       node.children.length === 1 &&
       node.children[0].type === 3
@@ -99,6 +106,13 @@ function markStaticRoots (node: ASTNode, isInFor: boolean) {
   }
 }
 
+/**
+ * 判断节点是否是静态的
+ * 
+ * 首先剔除文本节点（type = 2 或 3）
+ * 
+ * 符合静态：使用 v-pre 指令，非 v-if v-for v-else slot component <template>元素
+ */
 function isStatic (node: ASTNode): boolean {
   if (node.type === 2) { // expression
     return false
@@ -109,7 +123,7 @@ function isStatic (node: ASTNode): boolean {
   return !!(node.pre || (
     !node.hasBindings && // no dynamic bindings
     !node.if && !node.for && // not v-if or v-for or v-else
-    !isBuiltInTag(node.tag) && // not a built-in
+    !isBuiltInTag(node.tag) && // not a built-in  : slot,component
     isPlatformReservedTag(node.tag) && // not a component
     !isDirectChildOfTemplateFor(node) &&
     Object.keys(node).every(isStaticKey)

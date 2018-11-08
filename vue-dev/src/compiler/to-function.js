@@ -20,7 +20,7 @@ function createFunction (code, errors) {
 // 返回 compileToFunctions
 export function createCompileToFunctionFn (compile: Function): Function {
   const cache = Object.create(null)
-  //  这个方法返回一个对象，里面包含了render函数
+  //  这个方法返回一个对象，里面包含了render函数，这个 compileToFunctions 就是 entry-runtime-with-compiler 中把 template 转成render的方法
   return function compileToFunctions (
     template: string,
     options?: CompilerOptions,
@@ -57,6 +57,14 @@ export function createCompileToFunctionFn (compile: Function): Function {
     }
 
     // compile
+    /**
+     *compiled = {
+                    ast,
+                    render: code.render,
+                    staticRenderFns: code.staticRenderFns
+                }
+        创建这个 compiled 是这里的主要逻辑
+     */
     const compiled = compile(template, options)
 
     // check compilation errors/tips

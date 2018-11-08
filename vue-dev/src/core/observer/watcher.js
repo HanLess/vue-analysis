@@ -110,6 +110,42 @@ export default class Watcher {
     let value
     const vm = this.vm
     try {
+      /**
+       *  this.getter = () => {
+            vm._update(vm._render(), hydrating)
+          }
+
+          它会先执行 vm._render() 方法，并且在这个过程中会对 vm 上的数据访问，这个时候就触发了数据对象的 getter。
+          
+          vm._c = (a, b, c, d) => createElement(vm, a, b, c, d, false)
+
+          入参依次是：
+          * a : tag
+          * b : data
+          * c : children
+          * d : normalizationType
+
+          例子：
+          function render(){
+            return (isShow) ?
+            _c('ul', {
+                staticClass: "list",
+                class: bindCls
+              },
+              _l((data), function(item, index) {
+                return _c('li', {
+                  on: {
+                    "click": function($event) {
+                      clickItem(index)
+                    }
+                  }
+                },
+                [_v(_s(item) + ":" + _s(index))])
+              })
+            ) : _e()
+          }
+          
+       */
       value = this.getter.call(vm, vm)
     } catch (e) {
       if (this.user) {

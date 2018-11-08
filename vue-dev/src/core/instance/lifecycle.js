@@ -135,12 +135,16 @@ export function lifecycleMixin (Vue: Class<Component>) {
   }
 }
 
+/* $mount 方法的主体
+  通过 new Watcher() 来触发 Watcher 构造函数的执行，在构造函数里会触发 vm._render 的执行，从而触发 data 中数据的 getter 方法执行
+*/
 export function mountComponent (
   vm: Component,
   el: ?Element,
   hydrating?: boolean
 ): Component {
   vm.$el = el
+  // 已经执行到这里了还是没有render方法，生产环境一般不会出现
   if (!vm.$options.render) {
     vm.$options.render = createEmptyVNode
     if (process.env.NODE_ENV !== 'production') {
@@ -183,6 +187,7 @@ export function mountComponent (
       measure(`vue ${name} patch`, startTag, endTag)
     }
   } else {
+    // 生产环境
     updateComponent = () => {
       vm._update(vm._render(), hydrating)
     }

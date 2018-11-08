@@ -20,7 +20,7 @@ export const createCompiler = createCompilerCreator(function baseCompile (
     // 这里给 ast 增加了 static 和 staticRoot 两个属性，优化语法树
     optimize(ast, options)
   }
-
+  // 把优化后的 AST 树转换成可执行的代码
   const code = generate(ast, options)
   return {
     ast,

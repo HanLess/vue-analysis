@@ -1,8 +1,6 @@
 /* @flow */
 
 /**
- * to analysis!! 
- * 
  * 
  */
 

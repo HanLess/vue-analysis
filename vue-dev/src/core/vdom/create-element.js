@@ -72,7 +72,8 @@ export function _createElement (
   if (process.env.NODE_ENV !== 'production' &&
     isDef(data) && isDef(data.key) && !isPrimitive(data.key)
   ) {
-    if (!__WEEX__ || !('@binding' in data.key)) {
+    if (!__WEEX__ || !('@binding' in data.key))
+     {
       warn(
         'Avoid using non-primitive value as key, ' +
         'use string/number value instead.',
@@ -88,6 +89,8 @@ export function _createElement (
     data.scopedSlots = { default: children[0] }
     children.length = 0
   }
+
+  // 规范 childen 格式
   if (normalizationType === ALWAYS_NORMALIZE) {
     children = normalizeChildren(children)
   } else if (normalizationType === SIMPLE_NORMALIZE) {

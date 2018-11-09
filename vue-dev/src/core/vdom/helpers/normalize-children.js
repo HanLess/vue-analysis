@@ -16,7 +16,7 @@ import { isFalse, isTrue, isDef, isUndef, isPrimitive } from 'shared/util'
 // thing with Array.prototype.concat. It is guaranteed to be only 1-level deep
 // because functional components already normalize their own children.
 /**
-  simpleNormalizeChildren 方法调用场景是 render 函数当函数是编译生成的。
+  simpleNormalizeChildren 方法调用场景是 render 函数是编译生成的。
   理论上编译生成的 children 都已经是 VNode 类型的，
   但这里有一个例外，就是 functional component 函数式组件返回的是一个数组而不是一个根节点，
   所以会通过 Array.prototype.concat 方法把整个 children 数组打平，让它的深度只有一层。

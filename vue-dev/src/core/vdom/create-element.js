@@ -25,7 +25,6 @@ const ALWAYS_NORMALIZE = 2
 
 // wrapper function for providing a more flexible interface
 // without getting yelled at by flow
-// analysising
 export function createElement (
   context: Component,
   tag: any,
@@ -45,6 +44,10 @@ export function createElement (
   return _createElement(context, tag, data, children, normalizationType)
 }
 
+/**主要做两件事：
+ * （1）children 的规范化
+ * （2）VNode 的创建
+ */
 export function _createElement (
   context: Component,
   tag?: string | Class<Component> | Function | Object,
@@ -53,11 +56,6 @@ export function _createElement (
   normalizationType?: number
 ): VNode | Array<VNode> {
   if (isDef(data) && isDef((data: any).__ob__)) {
-    process.env.NODE_ENV !== 'production' && warn(
-      `Avoid using observed data object as vnode data: ${JSON.stringify(data)}\n` +
-      'Always create fresh vnode data objects in each render!',
-      context
-    )
     return createEmptyVNode()
   }
   // object syntax in v-bind

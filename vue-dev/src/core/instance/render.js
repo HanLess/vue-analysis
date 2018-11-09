@@ -72,8 +72,12 @@ export function renderMixin (Vue: Class<Component>) {
     return nextTick(fn, this)
   }
 
+  /**  
+   * 这个 _render 方法，会调用编译生成的 render 方法，即执行编译生成的可执行代码，生成一个 VNode 对象
+   */
   Vue.prototype._render = function (): VNode {
     const vm: Component = this
+    // 在 entry-runtime-with-compiler 入口页，已经把 template 转成 render 函数存在 options 中
     const { render, _parentVnode } = vm.$options
 
     // reset _rendered flag on slots for duplicate slot check

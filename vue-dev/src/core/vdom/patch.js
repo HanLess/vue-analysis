@@ -67,6 +67,7 @@ function createKeyToOldIdx (children, beginIdx, endIdx) {
   return map
 }
 
+// analysising
 export function createPatchFunction (backend) {
   let i, j
   const cbs = {}

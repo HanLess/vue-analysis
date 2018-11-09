@@ -11,8 +11,9 @@ import { renderStatic, markOnce } from './render-static'
 import { bindObjectListeners } from './bind-object-listeners'
 import { resolveScopedSlots } from './resolve-slots'
 
+// 具体文档看 flow/component.js 接口
 export function installRenderHelpers (target: any) {
-  target._o = markOnce
+  target._o = markOnce    
   target._n = toNumber
   target._s = toString
   target._l = renderList

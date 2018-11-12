@@ -44,6 +44,7 @@ const componentVNodeHooks = {
       const mountedNode: any = vnode // work around flow
       componentVNodeHooks.prepatch(mountedNode, mountedNode)
     } else {
+      // 这里的 child 是 vue 组件实例
       const child = vnode.componentInstance = createComponentInstanceForVnode(
         vnode,
         activeInstance
@@ -98,7 +99,12 @@ const componentVNodeHooks = {
 
 const hooksToMerge = Object.keys(componentVNodeHooks)
 
-// analysising
+/**
+ * 
+ * （1）构造子类构造函数
+ * （2）安装组件钩子函数
+ * （3）实例化 vnode
+ */
 export function createComponent (
   Ctor: Class<Component> | Function | Object | void,
   data: ?VNodeData,
@@ -113,6 +119,7 @@ export function createComponent (
   const baseCtor = context.$options._base
 
   // plain options object: turn it into a constructor
+  // 构造子类构造函数，通过 Vue.extend 方法，vue的api文档里有
   if (isObject(Ctor)) {
     Ctor = baseCtor.extend(Ctor)
   }
@@ -184,9 +191,11 @@ export function createComponent (
   }
 
   // install component management hooks onto the placeholder node
+  // 安装组件钩子函数
   installComponentHooks(data)
 
   // return a placeholder vnode
+  // 实例化 vnode 并返回
   const name = Ctor.options.name || tag
   const vnode = new VNode(
     `vue-component-${Ctor.cid}${name ? `-${name}` : ''}`,
@@ -221,6 +230,8 @@ export function createComponentInstanceForVnode (
     options.render = inlineTemplate.render
     options.staticRenderFns = inlineTemplate.staticRenderFns
   }
+
+  // 这里返回了一个vue实例，vnode.componentOptions.Ctor 是构造函数，通过 Vue.extend 生成
   return new vnode.componentOptions.Ctor(options)
 }
 

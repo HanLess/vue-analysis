@@ -90,6 +90,7 @@ export function withMacroTask (fn: Function): Function {
 /**
  * nextTick 把刷新页面、数据的事件放进 micro 或 macro 中，防止阻塞
  * 
+ * 所有dom事件触发的回调，都会走macro方法
  */
 export function nextTick (cb?: Function, ctx?: Object) {
   let _resolve

@@ -218,6 +218,8 @@ export default class Watcher {
   /**
    * Scheduler job interface.
    * Will be called by the scheduler.
+   * 
+   * 核心逻辑是 this.get()
    */
   run () {
     if (this.active) {

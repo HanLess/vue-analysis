@@ -122,7 +122,6 @@ export function createPatchFunction (backend) {
 
   let creatingElmInVPre = 0
 
-  // analysising !!
   function createElm (
     vnode,
     insertedVnodeQueue,
@@ -746,6 +745,7 @@ export function createPatchFunction (backend) {
           }
           // either not server-rendered, or hydration failed.
           // create an empty node and replace it
+          
           // 这里会把真实 html 元素 oldVnode 改造成vnode
           oldVnode = emptyNodeAt(oldVnode)
         }

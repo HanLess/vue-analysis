@@ -122,6 +122,7 @@ export function createPatchFunction (backend) {
 
   let creatingElmInVPre = 0
 
+  // analysising !!
   function createElm (
     vnode,
     insertedVnodeQueue,
@@ -686,6 +687,14 @@ export function createPatchFunction (backend) {
     }
   }
 
+  /**
+   * 这个 patch 函数，用来创建dom结构，有如下两种情况：
+   * （1）第一次渲染
+   * （2）数据变化，导致页面重新渲染
+   * 
+   * oldVnode ：旧的 vnode 节点，如果是（1），这个 oldVnode 是 vm.$el
+   * vnode：新的 vnode 节点
+   */
   return function patch (oldVnode, vnode, hydrating, removeOnly) {
     if (isUndef(vnode)) {
       if (isDef(oldVnode)) invokeDestroyHook(oldVnode)
@@ -700,6 +709,14 @@ export function createPatchFunction (backend) {
       isInitialPatch = true
       createElm(vnode, insertedVnodeQueue)
     } else {
+      /**
+       * 这个 else 里是主流程
+       */
+
+       /* isRealElement 用来判断是否是真实 html 元素，
+          在常规流程中，如果 isRealElement 为true，会在下面把 oldVnode 改造成一个 vnode 对象
+          （ dom -> vnode ）
+       */
       const isRealElement = isDef(oldVnode.nodeType)
       if (!isRealElement && sameVnode(oldVnode, vnode)) {
         // patch existing root node
@@ -729,6 +746,7 @@ export function createPatchFunction (backend) {
           }
           // either not server-rendered, or hydration failed.
           // create an empty node and replace it
+          // 这里会把真实 html 元素 oldVnode 改造成vnode
           oldVnode = emptyNodeAt(oldVnode)
         }
 

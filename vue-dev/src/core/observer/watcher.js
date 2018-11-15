@@ -104,6 +104,8 @@ export default class Watcher {
 
   /**
    * Evaluate the getter, and re-collect dependencies.
+   * 
+   * 在这里会重新收集dep
    */
   get () {
     pushTarget(this)
@@ -195,6 +197,9 @@ export default class Watcher {
 
   /**
    * Clean up for dependency collection.
+   * 
+   * 在执行 cleanupDeps 函数的时候，会首先遍历 deps，移除对 dep 的订阅，
+   * 然后把 newDepIds 和 depIds 交换，newDeps 和 deps 交换，并把 newDepIds 和 newDeps 清空
    */
   cleanupDeps () {
     let i = this.deps.length

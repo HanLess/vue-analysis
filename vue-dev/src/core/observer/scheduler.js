@@ -47,7 +47,7 @@ function flushSchedulerQueue () {
      1、 父组件比子组件先刷新
   // 2. A component's user watchers are run before its render watcher (because
   //    user watchers are created before the render watcher)
-      2、组件自定义的watcher.run 要先于默认 watcher.run 执行
+      2、组件自定义的watcher.run 要先于默认 watcher.run 执行，因为用户自定义 watcher 是在渲染 watcher 之前创建的
 
   // 3. If a component is destroyed during a parent component's watcher run,
   //    its watchers can be skipped.

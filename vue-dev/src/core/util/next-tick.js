@@ -87,6 +87,23 @@ export function withMacroTask (fn: Function): Function {
   })
 }
 
+
+/**
+ * 
+ * 数据的变化到 DOM 的重新渲染是一个异步过程，发生在下一个 tick。
+ * 这就是我们平时在开发的过程中，比如从服务端接口去获取数据的时候，数据做了修改，
+ * 如果我们的某些方法去依赖了数据修改后的 DOM 变化，我们就必须在 nextTick 后执行
+ * 
+ *  getData(res).then(()=>{
+ * 
+      this.xxx = res.data
+
+      this.$nextTick(() => {
+        // 这里我们可以获取变化后的 DOM
+      })
+
+    })
+ */
 /**
  * nextTick 把刷新页面、数据的事件放进 micro 或 macro 中，防止阻塞
  * 
@@ -96,6 +113,13 @@ export function withMacroTask (fn: Function): Function {
  */
 export function nextTick (cb?: Function, ctx?: Object) {
   let _resolve
+
+  /**
+   * 这里把所有 cb 推入 callbacks 中，而不是直接通过异步执行，为什么？
+   * 
+   * 通过 pending 来控制，先收集需要执行的方法
+   * 集中通过异步来执行，当执行异步的时候，就会把这些任务推入 任务队列，当执行栈清空后，执行任务队列里的任务
+   */
   callbacks.push(() => {
     if (cb) {
       try {

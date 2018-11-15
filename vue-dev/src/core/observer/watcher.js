@@ -41,8 +41,8 @@ export default class Watcher {
   sync: boolean;
   dirty: boolean;
   active: boolean;
-  deps: Array<Dep>;
-  newDeps: Array<Dep>;
+  deps: Array<Dep>;       // 上一次添加的 Dep 实例数组
+  newDeps: Array<Dep>;    // 新添加的 Dep 实例数组
   depIds: SimpleSet;
   newDepIds: SimpleSet;
   before: ?Function;
@@ -156,10 +156,24 @@ export default class Watcher {
     } finally {
       // "touch" every property so they are all tracked as
       // dependencies for deep watching
+      /**
+       * 递归去访问 value，触发它所有子项的 getter，this.deep 用来判断此数据（value）是否是对象，还有子属性
+       */
       if (this.deep) {
         traverse(value)
       }
       popTarget()
+      /**
+       * 为什么需要做 deps 订阅的移除？
+       * 
+       * 们的模板会根据 v-if 去渲染不同子模板 a 和 b，
+       * 当我们满足某种条件的时候渲染 a 的时候，会访问到 a 中的数据，
+       * 这时候我们对 a 使用的数据添加了 getter，做了依赖收集，
+       * 那么当我们去修改 a 的数据的时候，理应通知到这些订阅者。
+       * 那么如果我们一旦改变了条件渲染了 b 模板，又会对 b 使用的数据添加了 getter，
+       * 如果我们没有依赖移除的过程，那么这时候我去修改 a 模板的数据，
+       * 会通知 a 数据的订阅的回调，这显然是有浪费的
+       */
       this.cleanupDeps()
     }
     return value

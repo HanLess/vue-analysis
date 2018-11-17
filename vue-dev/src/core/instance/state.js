@@ -174,6 +174,7 @@ function initComputed (vm: Component, computed: Object) {
   const isSSR = isServerRendering()
 
   for (const key in computed) {
+    /** 判断 computed 中的属性格式是否正确 */
     const userDef = computed[key]
     const getter = typeof userDef === 'function' ? userDef : userDef.get
     if (process.env.NODE_ENV !== 'production' && getter == null) {
@@ -183,8 +184,12 @@ function initComputed (vm: Component, computed: Object) {
       )
     }
 
+
     if (!isSSR) {
       // create internal watcher for the computed property.
+      /**
+       * 重要！！！computed 功能的实现，是依靠 Watcher 的
+       */
       watchers[key] = new Watcher(
         vm,
         getter || noop,
@@ -241,13 +246,26 @@ export function defineComputed (
   Object.defineProperty(target, key, sharedPropertyDefinition)
 }
 
+/**
+ * 返回 computedGetter，作为 computed 中属性的 getter
+ * 
+ * 每次读取computed值的时候，都会执行 computedGetter
+ * 
+ * computedGetter 会重新计算 computed 的值
+ */
 function createComputedGetter (key) {
   return function computedGetter () {
     const watcher = this._computedWatchers && this._computedWatchers[key]
     if (watcher) {
       if (watcher.dirty) {
+        // 重新计算 computed value，具体看 evaluate 注释
         watcher.evaluate()
       }
+      /**
+       * 如果一个 computed 中用了 data 中的一个属性 one
+       * 此时 Dep.target 是渲染 watcher，执行 watcher.depend()
+       * 注意，在此之前，因为使用了 one，因此调用了 one.getter，在 getter 中绑定了 dep 与此 computed watcher
+       */
       if (Dep.target) {
         watcher.depend()
       }

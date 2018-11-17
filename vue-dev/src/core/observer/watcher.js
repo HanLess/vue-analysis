@@ -37,9 +37,9 @@ export default class Watcher {
   id: number;
   deep: boolean;
   user: boolean;
-  lazy: boolean;
+  lazy: boolean;        // 用在 computed watcher 中
   sync: boolean;
-  dirty: boolean;
+  dirty: boolean;       // 用在 computed watcher 中，平时为 false，只有 data 中的属性变化，触发 computed value 变化的时候才会被置为 true
   active: boolean;
   deps: Array<Dep>;       // 上一次添加的 Dep 实例数组
   newDeps: Array<Dep>;    // 新添加的 Dep 实例数组
@@ -112,7 +112,8 @@ export default class Watcher {
     let value
     const vm = this.vm
     try {
-      /**
+      /**绑定data中的属性时（computed也基于watcher，但 getter 就不是render函数了，而是定义的computed属性函数）：
+       * 
        *  this.getter = () => {
             vm._update(vm._render(), hydrating)
           }
@@ -270,6 +271,13 @@ export default class Watcher {
   /**
    * Evaluate the value of the watcher.
    * This only gets called for lazy watchers.
+   * 
+   * lazy = true 才会被调用，目前主要是 computed watcher 会用
+   * 这个方法的目的是：重新调用 get()，即重新调用computed方法，重新计算 value
+   * 
+   * 为什么要重新计算？
+   * 因为 computed 不同于 data 中的属性，set新值的时候会触发setter，从而触发 re-render
+   * 所以当computed用了 data 中的属性，此属性变化会触发 evaluate 执行，用属性的新值来计算新的 computed value
    */
   evaluate () {
     this.value = this.get()

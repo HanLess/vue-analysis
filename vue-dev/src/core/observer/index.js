@@ -166,6 +166,9 @@ export function defineReactive (
       const value = getter ? getter.call(obj) : val
       if (Dep.target) {
         dep.depend()
+        /**
+         * 这里的 if 判断，如果 key 是一个不为空的对象或数组，则给对象下面的属性执行 dep.depend()
+         */
         if (childOb) {
           childOb.dep.depend()
           if (Array.isArray(value)) {
@@ -212,11 +215,18 @@ export function set (target: Array<any> | Object, key: any, val: any): any {
     target.splice(key, 1, val)
     return val
   }
+  /**
+   * 如果 key 已经在 target 中了，则直接赋值，此时已经是响应式数据了，相当于在项目中直接赋值，走 re-render 流程
+   */
   if (key in target && !(key in Object.prototype)) {
     target[key] = val
     return val
   }
   const ob = (target: any).__ob__
+  /**
+   * 这里的判断的用途：阻止通过此 set 方法在vue实例上，或Vue类上直接set属性。
+   * target 必须是 data 下面的某个对象或数组
+   */
   if (target._isVue || (ob && ob.vmCount)) {
     process.env.NODE_ENV !== 'production' && warn(
       'Avoid adding reactive properties to a Vue instance or its root $data ' +
@@ -228,7 +238,13 @@ export function set (target: Array<any> | Object, key: any, val: any): any {
     target[key] = val
     return val
   }
+  /**
+   * 这里执行 defineReactive，把新增加的这个属性监控起来（设置  getter ，setter），等执行 getter 后，就纳入响应式中
+   */
   defineReactive(ob.value, key, val)
+  /**
+   * 这里手动执行 dep.notify，重新渲染页面
+   */
   ob.dep.notify()
   return val
 }

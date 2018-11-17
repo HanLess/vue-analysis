@@ -48,7 +48,7 @@ export function proxy (target: Object, sourceKey: string, key: string) {
 export function initState (vm: Component) {
   vm._watchers = []
   const opts = vm.$options
-  if (opts.props) initProps(vm, opts.props)
+  if (opts.props) initProps(vm, opts.props) // 与 initData 一样
   if (opts.methods) initMethods(vm, opts.methods)
   if (opts.data) {
     initData(vm)
@@ -57,7 +57,7 @@ export function initState (vm: Component) {
   }
   if (opts.computed) initComputed(vm, opts.computed)
   if (opts.watch && opts.watch !== nativeWatch) {
-    initWatch(vm, opts.watch)
+    initWatch(vm, opts.watch) // 遍历，执行 $watch
   }
 }
 
@@ -167,6 +167,18 @@ export function getData (data: Function, vm: Component): any {
 
 const computedWatcherOptions = { lazy: true }
 
+/**  
+ * 原理：
+ * 定义 computed 属性，是一个函数，如：
+ * 
+ * computed : {
+ *    name : function(){return 'hh' + this.age}
+ * }
+ * 
+ * 在 initComputed 过程中，会通过 Object.defineProperty 把 name 当作一个属性绑定到 vm 上（vue实例）
+ * 同时定义此 name 属性的 getter 方法，这个 getter 方法就是 function(){return 'hh'}，即定义的那个函数
+ * 当 data 中的 age 发生变化时，会触发 name 的 getter 执行，重新计算
+ */
 function initComputed (vm: Component, computed: Object) {
   // $flow-disable-line
   const watchers = vm._computedWatchers = Object.create(null)
@@ -202,6 +214,9 @@ function initComputed (vm: Component, computed: Object) {
     // component prototype. We only need to define computed properties defined
     // at instantiation here.
     if (!(key in vm)) {
+      /**
+       * 这里会把 computed value 绑定到 vm 上，同时会定义此 computed value 的 getter，每次 get 的时候会重新计算
+       */
       defineComputed(vm, key, userDef)
     } else if (process.env.NODE_ENV !== 'production') {
       if (key in vm.$data) {
@@ -247,7 +262,7 @@ export function defineComputed (
 }
 
 /**
- * 返回 computedGetter，作为 computed 中属性的 getter
+ * 返回 computedGetter，作为 computed 中属性的 getter（其实就是在定义时的那个函数）
  * 
  * 每次读取computed值的时候，都会执行 computedGetter
  * 

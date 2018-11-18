@@ -32,6 +32,15 @@ export const emptyNode = new VNode('', {}, [])
 
 const hooks = ['create', 'activate', 'update', 'remove', 'destroy']
 
+
+/**
+ *  判断两个VNode节点是否是同一个节点，需要满足以下条件： 
+    （1）key相同
+    （2）tag（当前节点的标签名）相同
+    （3）isComment（是否为注释节点）相同
+    （4）是否data（当前节点对应的对象，包含了具体的一些数据信息，是一个VNodeData类型，可以参考VNodeData类型中的数据信息）都有定义
+    （5）当标签是<input>的时候，type必须相同
+ */
 function sameVnode (a, b) {
   return (
     a.key === b.key && (
@@ -502,13 +511,32 @@ export function createPatchFunction (backend) {
     }
   }
 
+  /**
+   * patchVnode 负责把新的 vnode patch 到旧的 vnode 上
+   * 
+   * 执行逻辑：
+   * 
+   *  1. 如果两个vnode相等，不需要 patch，退出。 
+      2. 如果是异步占位，执行 hydrate 方法或者定义 isAsyncPlaceholder 为 true，然后退出。 
+      3. 如果两个vnode都为静态，不用更新，所以讲以前的 componentInstance 实例传给当前 vnode，并退出。 
+      4. 执行 prepatch 钩子。 
+      5. 遍历调用 update 回调，并执行 update 钩子。 
+      6. 如果两个 vnode 都有 children，且 vnode 没有 text、两个 vnode 不相等，执行 updateChildren 方法。这是虚拟 DOM 的关键。 
+      7. 如果新 vnode 有 children，而老的没有，清空文本，并添加 vnode 节点。 
+      8. 如果老 vnode 有 children，而新的没哟，清空文本，并移除 vnode 节点。 
+      9. 如果两个 vnode 都没有 children，老 vnode 有 text ，新 vnode 没有 text ，则清空 DOM 文本内容。 
+      10. 如果老 vnode 和新 vnode 的 text 不同，更新 DOM 元素文本内容。 
+      11. 调用 postpatch 钩子。
+   */
   function patchVnode (oldVnode, vnode, insertedVnodeQueue, removeOnly) {
+    // 1. 如果两个vnode相等，不需要 patch，退出。 
     if (oldVnode === vnode) {
       return
     }
 
     const elm = vnode.elm = oldVnode.elm
 
+    // 2. 如果是异步占位，执行 hydrate 方法或者定义 isAsyncPlaceholder 为 true，然后退出。 
     if (isTrue(oldVnode.isAsyncPlaceholder)) {
       if (isDef(vnode.asyncFactory.resolved)) {
         hydrate(oldVnode.elm, vnode, insertedVnodeQueue)
@@ -522,6 +550,7 @@ export function createPatchFunction (backend) {
     // note we only do this if the vnode is cloned -
     // if the new node is not cloned it means the render functions have been
     // reset by the hot-reload-api and we need to do a proper re-render.
+    // 3. 如果两个vnode都为静态，不用更新，所以讲以前的 componentInstance 实例传给当前 vnode，并退出。 
     if (isTrue(vnode.isStatic) &&
       isTrue(oldVnode.isStatic) &&
       vnode.key === oldVnode.key &&
@@ -533,18 +562,23 @@ export function createPatchFunction (backend) {
 
     let i
     const data = vnode.data
+    // 4. 执行 prepatch 钩子函数
     if (isDef(data) && isDef(i = data.hook) && isDef(i = i.prepatch)) {
       i(oldVnode, vnode)
     }
 
     const oldCh = oldVnode.children
     const ch = vnode.children
+    // 5. 遍历调用 update 回调，并执行 update 钩子。 
     if (isDef(data) && isPatchable(vnode)) {
       for (i = 0; i < cbs.update.length; ++i) cbs.update[i](oldVnode, vnode)
       if (isDef(i = data.hook) && isDef(i = i.update)) i(oldVnode, vnode)
     }
     if (isUndef(vnode.text)) {
       if (isDef(oldCh) && isDef(ch)) {
+        /**
+         *  6. 新旧 vnode 都有 children，且不同，执行 updateChildren 方法。重要！！！
+         */
         if (oldCh !== ch) updateChildren(elm, oldCh, ch, insertedVnodeQueue, removeOnly)
       } else if (isDef(ch)) {
         if (isDef(oldVnode.text)) nodeOps.setTextContent(elm, '')
@@ -555,8 +589,10 @@ export function createPatchFunction (backend) {
         nodeOps.setTextContent(elm, '')
       }
     } else if (oldVnode.text !== vnode.text) {
+      // 10. 如果老 vnode 和新 vnode 的 text 不同，更新 DOM 元素文本内容。 
       nodeOps.setTextContent(elm, vnode.text)
     }
+    // 11. 调用 postpatch 钩子。
     if (isDef(data)) {
       if (isDef(i = data.hook) && isDef(i = i.postpatch)) i(oldVnode, vnode)
     }
@@ -688,8 +724,8 @@ export function createPatchFunction (backend) {
 
   /**
    * 这个 patch 函数，用来创建dom结构，有如下两种情况：
-   * （1）第一次渲染
-   * （2）数据变化，导致页面重新渲染
+   * （1）第一次渲染（新旧节点不同）
+   * （2）数据变化，导致页面重新渲染（新旧节点相同）
    * 
    * oldVnode ：旧的 vnode 节点，如果是（1），这个 oldVnode 是 vm.$el
    * vnode：新的 vnode 节点
@@ -703,7 +739,6 @@ export function createPatchFunction (backend) {
     let isInitialPatch = false
     const insertedVnodeQueue = []
 
-    // analysising
     if (isUndef(oldVnode)) {
       // empty mount (likely as component), create new root element
       isInitialPatch = true
@@ -720,8 +755,15 @@ export function createPatchFunction (backend) {
       const isRealElement = isDef(oldVnode.nodeType)
       if (!isRealElement && sameVnode(oldVnode, vnode)) {
         // patch existing root node
+        /**
+         * 新旧节点相同，即数据变化，组件更新的情况
+         */
         patchVnode(oldVnode, vnode, insertedVnodeQueue, removeOnly)
       } else {
+        /**
+         *  这个 else 里的逻辑，是针对初次渲染的情况，即 oldVnode 与 vnode 不同
+         */
+
         if (isRealElement) {
           // mounting to a real element
           // check if this is server-rendered content and if we can perform

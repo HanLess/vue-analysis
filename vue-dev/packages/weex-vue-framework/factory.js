@@ -5840,6 +5840,9 @@ function createPatchFunction (backend) {
     }
   }
 
+  /**
+   * 调用 updateChildren，对子节点进行diff操作
+   */
   function updateChildren (parentElm, oldCh, newCh, insertedVnodeQueue, removeOnly) {
     var oldStartIdx = 0;
     var newStartIdx = 0;
@@ -5957,6 +5960,14 @@ function createPatchFunction (backend) {
     // note we only do this if the vnode is cloned -
     // if the new node is not cloned it means the render functions have been
     // reset by the hot-reload-api and we need to do a proper re-render.
+    /* 静态节点：没有数据变化
+    
+      如果新旧VNode都是静态的，同时它们的key相同（代表同一节点），
+      并且新的VNode是clone或者是标记了once（标记v-once属性，只渲染一次），
+      那么只需要替换 elm 以及 componentInstance 即可。
+
+      静态节点只需要把 dom 内容替换一下
+    */
     if (isTrue(vnode.isStatic) &&
       isTrue(oldVnode.isStatic) &&
       vnode.key === oldVnode.key &&

@@ -414,6 +414,24 @@ export function createPatchFunction (backend) {
     }
   }
 
+
+  /**
+   * 新老节点模型：
+   * 
+   * old vnode : old_one , old_two , old_three
+   * new vnode : new_one , new_two , new_three
+   *  
+   * 
+   * 流程：
+   * 更新子节点就是比对新旧两个节点数组，入参里的 oldCh, newCh
+   * 比对的方法：sameVnode
+   * 比对的过程：顺序遍历 oldCh, newCh ，从头到尾顺序比对
+   * 注意：以 newCh 的顺序为基准，来调整 dom 结构的顺序！！
+   * 目的：
+   * （1）找到新旧vnode数组中满足 sameVnode 的节点（vnode）（如果满足，我们称之为 对应），
+   *      执行 patchVnode，patchVnode 后，调整新的 dom 结构，以新的 vnode 顺序为准！！
+   * （2）对于找不到对应的节点，删除或增加 dom 节点
+   */
   function updateChildren (parentElm, oldCh, newCh, insertedVnodeQueue, removeOnly) {
     let oldStartIdx = 0
     let newStartIdx = 0
@@ -440,44 +458,96 @@ export function createPatchFunction (backend) {
       } else if (isUndef(oldEndVnode)) {
         oldEndVnode = oldCh[--oldEndIdx]
       } else if (sameVnode(oldStartVnode, newStartVnode)) {
+        /**
+         * 情况一：新老 VNode 节点的 start 或者 end 满足 sameVnode 时，即：sameVnode(old_one,new_one) == true
+         * 直接将该VNode节点进行patchVnode即可
+         */
         patchVnode(oldStartVnode, newStartVnode, insertedVnodeQueue)
         oldStartVnode = oldCh[++oldStartIdx]
         newStartVnode = newCh[++newStartIdx]
       } else if (sameVnode(oldEndVnode, newEndVnode)) {
+        /**
+         * 情况一：新老 VNode 节点的 start 或者 end 满足 sameVnode 时，即：sameVnode(old_one,new_one) == true
+         * 直接将该VNode节点进行patchVnode即可
+         */
         patchVnode(oldEndVnode, newEndVnode, insertedVnodeQueue)
         oldEndVnode = oldCh[--oldEndIdx]
         newEndVnode = newCh[--newEndIdx]
-      } else if (sameVnode(oldStartVnode, newEndVnode)) { // Vnode moved right
+      } else if (sameVnode(oldStartVnode, newEndVnode)) {
+        /**
+         * 情况二：oldStartVnode 与 newEndVnode 满足 sameVnode，即：sameVnode(old_one,new_three) == true
+         * 这时候说明 oldStartVnode（old_one） 已经跑到了oldEndVnode（old_three） 后面去了，进行 patchVnode 的同时还需要将真实 DOM 节点移动到 oldEndVnode 的后面
+         */
+        // Vnode moved right
         patchVnode(oldStartVnode, newEndVnode, insertedVnodeQueue)
         canMove && nodeOps.insertBefore(parentElm, oldStartVnode.elm, nodeOps.nextSibling(oldEndVnode.elm))
         oldStartVnode = oldCh[++oldStartIdx]
         newEndVnode = newCh[--newEndIdx]
-      } else if (sameVnode(oldEndVnode, newStartVnode)) { // Vnode moved left
+      } else if (sameVnode(oldEndVnode, newStartVnode)) {
+        /**
+         * 情况三（与情况二相反）：如果oldEndVnode与newStartVnode满足sameVnode，即：sameVnode(old_three,new_one) == true
+         * 这说明 oldEndVnode（old_three） 跑到了 oldStartVnode（old_one） 的前面，进行patchVnode的同时真实的DOM节点移动到了oldStartVnode的前面。
+         */
+        // Vnode moved left
         patchVnode(oldEndVnode, newStartVnode, insertedVnodeQueue)
         canMove && nodeOps.insertBefore(parentElm, oldEndVnode.elm, oldStartVnode.elm)
         oldEndVnode = oldCh[--oldEndIdx]
         newStartVnode = newCh[++newStartIdx]
       } else {
+        /**
+         * 情况四
+         */
+        /**
+         * oldKeyToIdx 是一个对象：key 是 old vnode 的 key 属性，value 是 old vnode 数组的 index，即：
+         * {
+         *  "old vnode 每项的key属性" : "old vnode 数组每项的index值"
+         * }
+         */
         if (isUndef(oldKeyToIdx)) oldKeyToIdx = createKeyToOldIdx(oldCh, oldStartIdx, oldEndIdx)
+        /**
+         * 寻找与 newStartVnode 一致 key 的旧的 VNode 节点
+         * oldKeyToIdx[newStartVnode.key]
+         * 
+         * 如果没有：createElm 创建新的 dom 节点
+         * 如果有：patchVnode的同时会将这个真实DOM（elmToMove）移动到 oldStartVnode 对应的真实DOM的前面
+         */
         idxInOld = isDef(newStartVnode.key)
           ? oldKeyToIdx[newStartVnode.key]
           : findIdxInOld(newStartVnode, oldCh, oldStartIdx, oldEndIdx)
-        if (isUndef(idxInOld)) { // New element
+        if (isUndef(idxInOld)) {
+           // New element
+           /**
+           * createElm 创建新的 dom 节点
+           */
           createElm(newStartVnode, insertedVnodeQueue, parentElm, oldStartVnode.elm, false, newCh, newStartIdx)
         } else {
           vnodeToMove = oldCh[idxInOld]
           if (sameVnode(vnodeToMove, newStartVnode)) {
+            /**
+             * 如果有：patchVnode的同时会将这个真实DOM（elmToMove）移动到 oldStartVnode 对应的真实DOM的前面
+             */
             patchVnode(vnodeToMove, newStartVnode, insertedVnodeQueue)
             oldCh[idxInOld] = undefined
             canMove && nodeOps.insertBefore(parentElm, vnodeToMove.elm, oldStartVnode.elm)
           } else {
             // same key but different element. treat as new element
+            /**
+             * createElm 创建新的 dom 节点
+             */
             createElm(newStartVnode, insertedVnodeQueue, parentElm, oldStartVnode.elm, false, newCh, newStartIdx)
           }
         }
         newStartVnode = newCh[++newStartIdx]
       }
     }
+    /**
+     * while 循环结束，处理剩余的 dom 节点，分两种情况：
+     * 
+     * oldStartIdx > oldEndIdx：即 old vnode 先遍历结束，new vnode 比 old vnode 多，则把 new vnode 多出来的部分创建dom节点并插入到真实 dom 中
+     * （批量调用createElm的接口将这些节点加入到真实DOM中去）
+     * 
+     * newStartIdx > newEndIdx：即 new vnode 先遍历结束，说明 old vnode 比 new vnode 多，需要把真实 dom 中多余的节点删掉。
+     */
     if (oldStartIdx > oldEndIdx) {
       refElm = isUndef(newCh[newEndIdx + 1]) ? null : newCh[newEndIdx + 1].elm
       addVnodes(parentElm, refElm, newCh, newStartIdx, newEndIdx, insertedVnodeQueue)
@@ -512,7 +582,7 @@ export function createPatchFunction (backend) {
   }
 
   /**
-   * patchVnode 负责把新的 vnode patch 到旧的 vnode 上
+   * patchVnode 负责把新的 vnode patch 到旧的 vnode 上，同时更新对应的 dom 节点
    * 
    * 执行逻辑：
    * 
@@ -550,7 +620,12 @@ export function createPatchFunction (backend) {
     // note we only do this if the vnode is cloned -
     // if the new node is not cloned it means the render functions have been
     // reset by the hot-reload-api and we need to do a proper re-render.
-    // 3. 如果两个vnode都为静态，不用更新，所以讲以前的 componentInstance 实例传给当前 vnode，并退出。 
+
+    /*
+     3. 如果两个vnode都为静态，不用更新，所以讲以前的 componentInstance 实例传给当前 vnode，并退出。 
+
+        静态节点：没有引用变量的节点
+     */
     if (isTrue(vnode.isStatic) &&
       isTrue(oldVnode.isStatic) &&
       vnode.key === oldVnode.key &&
@@ -569,7 +644,7 @@ export function createPatchFunction (backend) {
 
     const oldCh = oldVnode.children
     const ch = vnode.children
-    // 5. 遍历调用 update 回调，并执行 update 钩子。 
+    // 5. 遍历调用 update 回调，并执行 update 钩子。 这里更新了 dom 与 vnode，重要！！！
     if (isDef(data) && isPatchable(vnode)) {
       for (i = 0; i < cbs.update.length; ++i) cbs.update[i](oldVnode, vnode)
       if (isDef(i = data.hook) && isDef(i = i.update)) i(oldVnode, vnode)

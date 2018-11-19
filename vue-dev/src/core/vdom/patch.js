@@ -431,6 +431,8 @@ export function createPatchFunction (backend) {
    * （1）找到新旧vnode数组中满足 sameVnode 的节点（vnode）（如果满足，我们称之为 对应），
    *      执行 patchVnode，patchVnode 后，调整新的 dom 结构，以新的 vnode 顺序为准！！
    * （2）对于找不到对应的节点，删除或增加 dom 节点（旧 vnode 多了就删，新 vnode 多了就加）
+   * 
+   * 总结：以 new vnode 为准更新 dom 树与 vnode queue
    */
   function updateChildren (parentElm, oldCh, newCh, insertedVnodeQueue, removeOnly) {
     let oldStartIdx = 0
@@ -584,6 +586,12 @@ export function createPatchFunction (backend) {
   /**
    * patchVnode 负责把新的 vnode patch 到旧的 vnode 上，同时更新对应的 dom 节点
    * 
+   * 其实就做了三件事：
+   * （1）更新 vnode
+   * 一个dom元素里只有两种情况，text 或 childern：
+   * （2）更新 dom 中的 text
+   * （3）更新 children
+   * 
    * 执行逻辑：
    * 
    *  1. 如果两个vnode相等，不需要 patch，退出。 
@@ -644,11 +652,14 @@ export function createPatchFunction (backend) {
 
     const oldCh = oldVnode.children
     const ch = vnode.children
-    // 5. 遍历调用 update 回调，并执行 update 钩子。 这里更新了 dom 与 vnode，重要！！！
+    // 5. 遍历调用 update 回调，并执行 update 钩子。 这里更新了 vnode，重要！！！
     if (isDef(data) && isPatchable(vnode)) {
       for (i = 0; i < cbs.update.length; ++i) cbs.update[i](oldVnode, vnode)
       if (isDef(i = data.hook) && isDef(i = i.update)) i(oldVnode, vnode)
     }
+    /**
+     * 新的 vnode 没有 text 节点的情况
+     */
     if (isUndef(vnode.text)) {
       if (isDef(oldCh) && isDef(ch)) {
         /**
@@ -656,15 +667,24 @@ export function createPatchFunction (backend) {
          */
         if (oldCh !== ch) updateChildren(elm, oldCh, ch, insertedVnodeQueue, removeOnly)
       } else if (isDef(ch)) {
+        /**
+         * 7. 如果新 vnode 有 children，而老的没有，清空文本，并添加 vnode 节点。 
+         */
         if (isDef(oldVnode.text)) nodeOps.setTextContent(elm, '')
         addVnodes(elm, null, ch, 0, ch.length - 1, insertedVnodeQueue)
       } else if (isDef(oldCh)) {
+        /**
+         * 8. 如果老 vnode 有 children，而新的没哟，清空文本，并移除 vnode 节点。 
+         */
         removeVnodes(elm, oldCh, 0, oldCh.length - 1)
       } else if (isDef(oldVnode.text)) {
+        /**
+         * 9. 如果两个 vnode 都没有 children，老 vnode 有 text ，新 vnode 没有 text ，则清空 DOM 文本内容。 
+         */
         nodeOps.setTextContent(elm, '')
       }
     } else if (oldVnode.text !== vnode.text) {
-      // 10. 如果老 vnode 和新 vnode 的 text 不同，更新 DOM 元素文本内容。 
+      // 10. 如果老 vnode 和新 vnode 的 text 不同，更新 DOM 元素文本内容。这种情况也包括： 老 vnode 没有 text ，新 vnode 有 text，则新增 dom 元素文本内容
       nodeOps.setTextContent(elm, vnode.text)
     }
     // 11. 调用 postpatch 钩子。

@@ -430,7 +430,7 @@ export function createPatchFunction (backend) {
    * 目的：
    * （1）找到新旧vnode数组中满足 sameVnode 的节点（vnode）（如果满足，我们称之为 对应），
    *      执行 patchVnode，patchVnode 后，调整新的 dom 结构，以新的 vnode 顺序为准！！
-   * （2）对于找不到对应的节点，删除或增加 dom 节点
+   * （2）对于找不到对应的节点，删除或增加 dom 节点（旧 vnode 多了就删，新 vnode 多了就加）
    */
   function updateChildren (parentElm, oldCh, newCh, insertedVnodeQueue, removeOnly) {
     let oldStartIdx = 0

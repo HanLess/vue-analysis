@@ -416,6 +416,10 @@ export function createPatchFunction (backend) {
 
 
   /**
+   * updateChildren 实现了diff算法主要逻辑：
+   * （1）优先处理 头-头，尾-尾，头-尾，对应的特殊情况
+   * （2）处理非特殊情况，具体看 情况五
+   * 
    * 新老节点模型：
    * 
    * old vnode : old_one , old_two , old_three
@@ -461,7 +465,7 @@ export function createPatchFunction (backend) {
         oldEndVnode = oldCh[--oldEndIdx]
       } else if (sameVnode(oldStartVnode, newStartVnode)) {
         /**
-         * 情况一：新老 VNode 节点的 start 或者 end 满足 sameVnode 时，即：sameVnode(old_one,new_one) == true
+         * 情况一：新老 VNode 节点的 start 满足 sameVnode 时，即：sameVnode(old_one,new_one) == true
          * 直接将该VNode节点进行patchVnode即可
          */
         patchVnode(oldStartVnode, newStartVnode, insertedVnodeQueue)
@@ -469,7 +473,7 @@ export function createPatchFunction (backend) {
         newStartVnode = newCh[++newStartIdx]
       } else if (sameVnode(oldEndVnode, newEndVnode)) {
         /**
-         * 情况一：新老 VNode 节点的 start 或者 end 满足 sameVnode 时，即：sameVnode(old_one,new_one) == true
+         * 情况二：新老 VNode 节点的 end 满足 sameVnode 时，即：sameVnode(old_three,new_three) == true
          * 直接将该VNode节点进行patchVnode即可
          */
         patchVnode(oldEndVnode, newEndVnode, insertedVnodeQueue)
@@ -477,7 +481,7 @@ export function createPatchFunction (backend) {
         newEndVnode = newCh[--newEndIdx]
       } else if (sameVnode(oldStartVnode, newEndVnode)) {
         /**
-         * 情况二：oldStartVnode 与 newEndVnode 满足 sameVnode，即：sameVnode(old_one,new_three) == true
+         * 情况三：oldStartVnode 与 newEndVnode 满足 sameVnode，即：sameVnode(old_one,new_three) == true
          * 这时候说明 oldStartVnode（old_one） 已经跑到了oldEndVnode（old_three） 后面去了，进行 patchVnode 的同时还需要将真实 DOM 节点移动到 oldEndVnode 的后面
          */
         // Vnode moved right
@@ -487,7 +491,7 @@ export function createPatchFunction (backend) {
         newEndVnode = newCh[--newEndIdx]
       } else if (sameVnode(oldEndVnode, newStartVnode)) {
         /**
-         * 情况三（与情况二相反）：如果oldEndVnode与newStartVnode满足sameVnode，即：sameVnode(old_three,new_one) == true
+         * 情况四（与情况二相反）：如果oldEndVnode与newStartVnode满足sameVnode，即：sameVnode(old_three,new_one) == true
          * 这说明 oldEndVnode（old_three） 跑到了 oldStartVnode（old_one） 的前面，进行patchVnode的同时真实的DOM节点移动到了oldStartVnode的前面。
          */
         // Vnode moved left
@@ -497,7 +501,7 @@ export function createPatchFunction (backend) {
         newStartVnode = newCh[++newStartIdx]
       } else {
         /**
-         * 情况四
+         * 情况五：其他非特殊情况
          */
         /**
          * oldKeyToIdx 是一个对象：key 是 old vnode 的 key 属性，value 是 old vnode 数组的 index，即：
@@ -511,7 +515,7 @@ export function createPatchFunction (backend) {
          * oldKeyToIdx[newStartVnode.key]
          * 
          * 如果没有：createElm 创建新的 dom 节点
-         * 如果有：patchVnode的同时会将这个真实DOM（elmToMove）移动到 oldStartVnode 对应的真实DOM的前面
+         * 如果有：patchVnode 的同时会将这个真实DOM（elmToMove）移动到 oldStartVnode 对应的真实DOM的前面
          */
         idxInOld = isDef(newStartVnode.key)
           ? oldKeyToIdx[newStartVnode.key]
@@ -591,6 +595,12 @@ export function createPatchFunction (backend) {
    * 一个dom元素里只有两种情况，text 或 childern：
    * （2）更新 dom 中的 text
    * （3）更新 children
+   * 
+   * diff 算法：
+   * patchVnode + updateChildren 两个方法配合递归调用，实现了vue的vnode diff算法，主要特点是：
+   * （1）同一层跟同一层的 vnode 对比，不会跨层
+   * （2）从两端向中间遍历，同时优先处理特殊情况
+   * （3）dom节点复用（sameVnode 中的判断条件包括了相同 dom 节点的情况，即满足 sameVnode 的两个vnode，dom类型一定相同，这时候会更改属性，不改dom结构，称之为节点复用）
    * 
    * 执行逻辑：
    * 

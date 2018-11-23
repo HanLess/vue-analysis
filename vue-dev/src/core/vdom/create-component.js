@@ -135,9 +135,17 @@ export function createComponent (
   }
 
   // async component
+  /**
+   * 异步组件逻辑
+   * 
+   * 此时 Ctor 是一个函数
+   */
   let asyncFactory
   if (isUndef(Ctor.cid)) {
     asyncFactory = Ctor
+    /**
+     * 异步组件主要逻辑 resolveAsyncComponent
+     */
     Ctor = resolveAsyncComponent(asyncFactory, baseCtor, context)
     if (Ctor === undefined) {
       // return a placeholder node for async component, which is rendered

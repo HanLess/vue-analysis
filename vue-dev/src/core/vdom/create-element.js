@@ -108,6 +108,15 @@ export function _createElement (
     } else if (isDef(Ctor = resolveAsset(context.$options, 'components', tag))) {
       // component
       // 通过template形式使用组件
+      /**
+       * 如：{
+       *        template : "<App />",
+       *        components : {App}
+       *      }
+       * 
+       * 正常情况下 Ctor 是一个对象，里面有这个组件的信息
+       * 异步组件，Ctor 是一个函数：() => import('./App')
+       */
       vnode = createComponent(Ctor, data, context, children, tag)
     } else {
       // unknown or unlisted namespaced elements

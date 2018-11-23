@@ -114,7 +114,19 @@ export function _createElement (
        *        components : {App}
        *      }
        * 
-       * 正常情况下 Ctor 是一个对象，里面有这个组件的信息
+       * 正常情况下 Ctor 是一个对象，里面有这个组件的信息，对于 .vue 文件输出的内容如下：
+       * 
+       * {
+       *    beforeCreate,
+       *    beforeDestroy,
+       *    render,
+       *    staticRenderFns,
+       *    __file,
+       *    _compiled,
+            ...
+       * }
+       * 即经过 parse ，已经生成 render 方法的对象
+       * 
        * 异步组件，Ctor 是一个函数：() => import('./App')
        */
       vnode = createComponent(Ctor, data, context, children, tag)
@@ -129,7 +141,7 @@ export function _createElement (
     }
   } else {
     // direct component options / constructor
-    // 通过render形式使用组件
+    // 通过 render 形式使用组件
     vnode = createComponent(tag, data, context, children)
   }
   if (Array.isArray(vnode)) {

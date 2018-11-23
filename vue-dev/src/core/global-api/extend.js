@@ -15,6 +15,9 @@ export function initExtend (Vue: GlobalAPI) {
 
   /**
    * Class inheritance
+   * 
+   * 根据入参对象，创造一个 Vue 的子类（构造函数），同时把这个构造函数存在入参对象的 _Ctor 里
+   * 
    */
   Vue.extend = function (extendOptions: Object): Function {
     extendOptions = extendOptions || {}
@@ -33,10 +36,17 @@ export function initExtend (Vue: GlobalAPI) {
       validateComponentName(name)
     }
 
-    const Sub = function VueComponent (options) {
+    /**
+     * 
+     *  重要！！ 这里 Sub 继承了 Vue，在 new Sub() 的时候执行 new Vue 的流程
+     * 
+     * to analysis 这里有个问题，什么时候 new Sub() , 实例化组件 ?
+     */
+    const Sub = function VueComponent (options) { 
       this._init(options)
     }
     Sub.prototype = Object.create(Super.prototype)
+
     Sub.prototype.constructor = Sub
     Sub.cid = cid++
     Sub.options = mergeOptions(

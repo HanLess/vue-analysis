@@ -594,7 +594,10 @@ function processAttrs (el) {
       if (modifiers) {
         name = name.replace(modifierRE, '')
       }
-      if (bindRE.test(name)) { // v-bind
+      if (bindRE.test(name)) {
+
+         // v-bind 或 : 的情况，绑定数据在这里处理
+
         name = name.replace(bindRE, '')
         value = parseFilters(value)
         isProp = false
@@ -622,10 +625,16 @@ function processAttrs (el) {
         } else {
           addAttr(el, name, value)
         }
-      } else if (onRE.test(name)) { // v-on
+      } else if (onRE.test(name)) {
+
+         // v-on 或 @ ，绑定事件在这里处理
+
         name = name.replace(onRE, '')
         addHandler(el, name, value, modifiers, false, warn)
-      } else { // normal directives
+      } else {
+
+         // normal directives 其他所有的情况  dirRE = /^v-|^@|^:/
+
         name = name.replace(dirRE, '')
         // parse arg
         const argMatch = name.match(argRE)

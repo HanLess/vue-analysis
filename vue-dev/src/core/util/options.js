@@ -408,6 +408,8 @@ export function mergeOptions (
  * Resolve an asset.
  * This function is used because child instances need access
  * to assets defined in its ancestor chain.
+ * 
+ * 这个方法用来获取实例 options 上的属性，适配了多种情况
  */
 export function resolveAsset (
   options: Object,
@@ -421,6 +423,11 @@ export function resolveAsset (
   }
   const assets = options[type]
   // check local registration variations first
+  /**
+   * 先直接使用 id 拿，
+   * 如果不存在，则把 id 变成驼峰的形式再拿，
+   * 如果仍然不存在则在驼峰的基础上把首字母再变成大写的形式再拿
+   */
   if (hasOwn(assets, id)) return assets[id]
   const camelizedId = camelize(id)
   if (hasOwn(assets, camelizedId)) return assets[camelizedId]

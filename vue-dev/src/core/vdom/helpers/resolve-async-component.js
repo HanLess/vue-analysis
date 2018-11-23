@@ -36,7 +36,12 @@ export function createAsyncPlaceholder (
   node.asyncMeta = { data, context, children, tag }
   return node
 }
-
+/**
+ * 
+ * @param {*} factory 传入的异步组件函数 : () => import('./App')
+ * @param {*} baseCtor Vue
+ * @param {*} context 引用此异步组件的 vm 实例
+ */
 export function resolveAsyncComponent (
   factory: Function,
   baseCtor: Class<Component>,
@@ -88,12 +93,20 @@ export function resolveAsyncComponent (
       }
     })
 
+    /**
+     * () => import('./App') 逻辑处理
+     * 
+     * 当执行完 res = factory(resolve, reject)，返回的值就是 import('./my-async-component') 的返回值，它是一个 Promise 对象
+     */
     const res = factory(resolve, reject)
 
     if (isObject(res)) {
       if (typeof res.then === 'function') {
         // () => Promise
         if (isUndef(factory.resolved)) {
+          /**
+           * 当组件异步加载成功后，执行 resolve，加载失败则执行 reject
+           */
           res.then(resolve, reject)
         }
       } else if (isDef(res.component) && typeof res.component.then === 'function') {

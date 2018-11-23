@@ -15,13 +15,10 @@ import VNode, { createEmptyVNode } from '../vdom/vnode'
 
 import { isUpdatingChildComponent } from './lifecycle'
 
-// to analysis!!!
 /**
  * 
  * createElement : render 函数的主体方法
  */
-
-
 export function initRender (vm: Component) {
   vm._vnode = null // the root of the child tree
   vm._staticTrees = null // v-once cached trees

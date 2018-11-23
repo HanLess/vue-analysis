@@ -120,7 +120,12 @@ export function createComponent (
   const baseCtor = context.$options._base
 
   // plain options object: turn it into a constructor
-  // 构造子类构造函数，通过 Vue.extend 方法，vue的api文档里有
+  /*
+     构造子类构造函数，通过 Vue.extend 方法，vue的api文档里有
+     这里经过 Vue.extend 后，Ctor 由对象变为函数
+
+     相当于调用了 Vue.component ，只不过没有挂在全局 options 下
+  */
   if (isObject(Ctor)) {
     Ctor = baseCtor.extend(Ctor)
   }
@@ -135,9 +140,17 @@ export function createComponent (
   }
 
   // async component
+  /**
+   * 异步组件逻辑
+   * 
+   * 此时 Ctor 是一个函数
+   */
   let asyncFactory
   if (isUndef(Ctor.cid)) {
     asyncFactory = Ctor
+    /**
+     * 异步组件主要逻辑 resolveAsyncComponent
+     */
     Ctor = resolveAsyncComponent(asyncFactory, baseCtor, context)
     if (Ctor === undefined) {
       // return a placeholder node for async component, which is rendered

@@ -45,7 +45,7 @@ const componentVNodeHooks = {
       const mountedNode: any = vnode // work around flow
       componentVNodeHooks.prepatch(mountedNode, mountedNode)
     } else {
-      // 这里的 child 是 vue 组件实例
+      // 这里的 child 是 vue组件实例
       const child = vnode.componentInstance = createComponentInstanceForVnode(
         vnode,
         activeInstance
@@ -245,7 +245,7 @@ export function createComponentInstanceForVnode (
     options.staticRenderFns = inlineTemplate.staticRenderFns
   }
 
-  // 这里返回了一个vue实例，vnode.componentOptions.Ctor 是构造函数，通过 Vue.extend 生成
+  // 这里返回了一个vue组件实例，vnode.componentOptions.Ctor 是构造函数，通过 Vue.extend 生成
   return new vnode.componentOptions.Ctor(options)
 }
 

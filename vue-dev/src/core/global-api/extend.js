@@ -40,7 +40,6 @@ export function initExtend (Vue: GlobalAPI) {
      * 
      *  重要！！ 这里 Sub 继承了 Vue，在 new Sub() 的时候执行 new Vue 的流程
      * 
-     * to analysis 这里有个问题，什么时候 new Sub() , 实例化组件 ?
      */
     const Sub = function VueComponent (options) { 
       this._init(options)

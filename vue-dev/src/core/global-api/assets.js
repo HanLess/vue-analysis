@@ -23,6 +23,12 @@ export function initAssetRegisters (Vue: GlobalAPI) {
           definition.name = definition.name || id
 
           // 这里可以证明，vue组件也是Vue对象
+          /**
+           * Vue.component实现！！
+           * 
+           * 相当于 Vue.extend 把这个对象转换成一个继承于 Vue 的构造函数，
+           * 最后通过 this.options[type + 's'][id] = definition 把它挂载到 Vue.options.components 上
+           */
 
           definition = this.options._base.extend(definition)
         }

@@ -33,5 +33,5 @@
 
 <a href="https://github.com/HanLess/vue-analysis/blob/master/flowImg/%E7%BC%96%E8%AF%91%EF%BC%88render%E5%87%BD%E6%95%B0%E7%94%9F%E6%88%90%E6%B5%81%E7%A8%8B%EF%BC%89.png">编译（render函数生成流程）</a>
 
-#### 在读源码的过程中，在没个关键节点都做了详细的注释，源码是 vue-dev，因为一直认为配合代码看注释、文档效果是最好的
+#### 在读源码的过程中，在每个关键节点都做了详细的注释，源码是 vue-dev，因为一直认为配合代码看注释、文档效果是最好的
 

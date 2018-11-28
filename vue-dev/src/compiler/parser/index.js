@@ -627,8 +627,9 @@ function processAttrs (el) {
         }
       } else if (onRE.test(name)) {
 
-         // v-on 或 @ ，绑定事件在这里处理
-
+         /* v-on 或 @ ，绑定事件在这里处理，经过此处编译后，会把绑定的事件存在 AST 对象里，
+         经过后面的 generate 会生成可执行代码
+        */
         name = name.replace(onRE, '')
         addHandler(el, name, value, modifiers, false, warn)
       } else {

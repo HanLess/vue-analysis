@@ -82,6 +82,20 @@ export function createPatchFunction (backend) {
 
   const { modules, nodeOps } = backend
 
+  /**
+   * modules 来源 platforms/runtime/modules
+   * 
+   * modules 中描述了 vnode 创建与更新时，针对 vnode 各个属性的，create 和 update 的钩子函数
+   * 
+   * 这里会把各个钩子函数分类集中管理，统一管理在 cbs 中，如下：
+   * 
+   * cbs = {
+   *    create : [...],
+   *    update : [...],
+   *    ...
+   * }
+   */
+
   for (i = 0; i < hooks.length; ++i) {
     cbs[hooks[i]] = []
     for (j = 0; j < modules.length; ++j) {
@@ -925,6 +939,9 @@ export function createPatchFunction (backend) {
             }
             ancestor.elm = vnode.elm
             if (patchable) {
+              /**
+               * 遍历执行 create 钩子
+               */
               for (let i = 0; i < cbs.create.length; ++i) {
                 cbs.create[i](emptyNode, ancestor)
               }

@@ -75,6 +75,9 @@ function remove (
 }
 
 function updateDOMListeners (oldVnode: VNodeWithData, vnode: VNodeWithData) {
+  /**
+   * vnode.data.on 就是此节点上绑定的事件
+   */
   if (isUndef(oldVnode.data.on) && isUndef(vnode.data.on)) {
     return
   }
@@ -82,6 +85,9 @@ function updateDOMListeners (oldVnode: VNodeWithData, vnode: VNodeWithData) {
   const oldOn = oldVnode.data.on || {}
   target = vnode.elm
   normalizeEvents(on)
+  /**
+   * 更新 vnode 节点事件绑定
+   */
   updateListeners(on, oldOn, add, remove, vnode.context)
   target = undefined
 }

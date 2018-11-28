@@ -44,6 +44,15 @@ export function addDirective (
   el.plain = false
 }
 
+
+/**
+ * modifiers 事件修饰符
+ * 
+ * 此方法做三件事：
+ * （1）根据 modifier 修饰符对事件名 name 做处理
+ * （2）接着根据 modifier.native 判断是一个纯原生事件还是普通事件，分别对应 el.nativeEvents 和 el.events
+ * （3）最后按照 name 对事件做归类，并把回调函数的字符串保留到对应的事件中
+ */
 export function addHandler (
   el: ASTElement,
   name: string,
@@ -65,6 +74,9 @@ export function addHandler (
     )
   }
 
+  /**
+   * capture , once , passive 修饰符处理
+   */
   // check capture modifier
   if (modifiers.capture) {
     delete modifiers.capture
@@ -83,6 +95,9 @@ export function addHandler (
   // normalize click.right and click.middle since they don't actually fire
   // this is technically browser-specific, but at least for now browsers are
   // the only target envs that have right/middle clicks.
+  /**
+   * 处理 click，中，右键情况
+   */
   if (name === 'click') {
     if (modifiers.right) {
       name = 'contextmenu'
@@ -92,6 +107,9 @@ export function addHandler (
     }
   }
 
+  /**
+   * 根据 modifier.native 判断是一个纯原生事件还是普通事件
+   */
   let events
   if (modifiers.native) {
     delete modifiers.native

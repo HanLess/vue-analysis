@@ -35,9 +35,11 @@ const route = this.router.match(location, this.current)
 （3）要用history模式需要服务端配合，原因如下：
 
 ```
+/*
 我们的应用是个单页客户端应用，如果后台没有正确的配置，当用户在浏览器直接访问 http://oursite.com/user/id 就会返回 404。
 
 所以，要在服务端增加一个覆盖所有情况的候选资源：如果 URL 匹配不到任何静态资源，则应该返回同一个 index.html 页面，这个页面就是你 app 依赖的页面
+*/
 ```
 
 

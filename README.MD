@@ -26,6 +26,7 @@ $mount方法的执行：
 <ul>
   <li>$mount 方法一定是最后执行的，无论是主动调用，还是在 _init 中默认执行</li>
   <li>最后执行的结果就是：整个 vue 实例已经创建完毕，相关属性已经挂载完成，然后再执行 $mount 相关的逻辑</li>
+  <li>整个 Vue 的实现可以理解为一辆车的组装，_init 方法只能算是把钥匙插进去，执行 $mount 才是真正的启动</li> 
 </ul>
 
 <img src = "https://github.com/HanLess/vue-analysis/blob/master/flowImg/%24mount%E6%96%B9%E6%B3%95%E7%9A%84%E6%89%A7%E8%A1%8C.png" />

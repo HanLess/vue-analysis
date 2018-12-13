@@ -128,6 +128,44 @@ Promise.all(matchedComponents.map(component => {
 
 可以看到，在 entry-server 中获取异步数据，塞给前端。因为是通过 entry-server 来获取 vue 实例的，所以每次在服务端 render 的时候一定会执行这里，也就会获取数据了
 
+#### 项目结构的变化
+
+在传统 vue 项目中，main.js 里创建了一个 vue 实例（new Vue），在 SSR 中，main.js 变为一个工厂函数，用来提供新的 vue 实例，如下
+
+```
+// 导出一个工厂函数，用于创建新的vue实例
+export function createApp() {
+    const router = createRouter()
+    const store = createStore()
+    const app = new Vue({
+        router,
+        store,
+        render: h => h(App)
+    })
+
+    return app
+}
+```
+
+然后在 entry-client , entry-server 中各自调用 main，创建 vue 实例
+
+#### 怎么理解 entry-client , entry-server
+
+SSR 把 vue 项目渲染了两次，一次在服务端，一次在客户端。在两个端渲染，都需要一个编译后的 js 作为驱动（webpack编译输出的内容），而 entry-client 与 entry-server 是两个端编译的入口
+
+<ul>
+  <li>entry-server：作用是给 renderToString 提供新的 vue 实例（这个 vue 实例是一个快照，保存着某种状态）</li>
+  <li>entry-client：可以认为等于传统 vue 项目的 main.js 文件，用来初始化 vue</li>
+</ul>
+
+
+
+
+
+
+
+
+
 
 
 

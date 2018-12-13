@@ -109,9 +109,24 @@ created(){
 
 （3）那如何在服务端渲染的时候，异步获取初始化数据（第一屏数据），并渲染给前端？
 
+```
+// entry-server
 
+// 遍历路由下所以的组件，如果有需要服务端渲染的请求，则进行请求
+Promise.all(matchedComponents.map(component => {
+    if (component.serverRequest || component.methods.serverRequest) {
+        let serverRequest = component.serverRequest || component.methods.serverRequest
 
+        return serverRequest(app.$store)
+    }
+})).then(() => {
+    context.state = app.$store.state
+    resolve(app)
+}).catch(reject)
 
+```
+
+可以看到，在 entry-server 中获取异步数据，塞给前端。因为是通过 entry-server 来获取 vue 实例的，所以每次在服务端 render 的时候一定会执行这里，也就会获取数据了
 
 
 

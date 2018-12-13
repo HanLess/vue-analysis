@@ -53,7 +53,7 @@ createApp(context).then(app => {
 
 可以看到，renderer.renderToString 的入参是一个 app，是一个 vue 实例（createApp 创造），require('./dist/bundle.server.js')['default'] 中创造的vue 实例，已经定格了当前项目的状态，会渲染成 html 反给前端
 
-
+#### 项目的正常运转，需要靠生成的客户端 js，即 entry-client 为入口的，webpack 打包出来的文件
 
 
 

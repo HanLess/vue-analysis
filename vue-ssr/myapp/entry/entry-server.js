@@ -14,8 +14,10 @@ export default context => {
 
         // 遍历路由下所以的组件，如果有需要服务端渲染的请求，则进行请求
         Promise.all(matchedComponents.map(component => {
-            if (component.serverRequest) {
-                return component.serverRequest(app.$store)
+            if (component.serverRequest || component.methods.serverRequest) {
+                let serverRequest = component.serverRequest || component.methods.serverRequest
+
+                return serverRequest(app.$store)
             }
         })).then(() => {
             context.state = app.$store.state

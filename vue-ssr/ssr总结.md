@@ -55,15 +55,59 @@ createApp(context).then(app => {
 
 #### 项目的正常运转，需要靠生成的客户端 js，即 entry-client 为入口的，webpack 打包出来的文件
 
+#### 服务端渲染的钩子函数
 
+<ul>
+  <li>服务端渲染只会执行 beforeCreated , created 两个钩子函数</li>
+  <li>原因：服务端渲染只是一张“快照”，所以也不需要进行响应数据的绑定，且不需要进行渲染（$mount），所以只需要执行上述两个钩子</li>
+</ul>
 
+#### 对于异步获取数据，并更改响应数据
 
+（1）对于在 created 中同步更改响应数据，服务端会执行created，并把“快照”返回前端，如下
 
+```
+<template>
+    <div>
+          home
+          <div>{{createdData}}</div>
+    </div>
+</template>
+<script>
+export default {
+    created(){
+        // setTimeout(() => {
+        //     this.createdData = "createdData changed!!!!!!!"
+        // },1000)
+        this.createdData = "createdData changed!!!!!!!"
+    },
+    data(){
+        return {
+            createdData: "init data",
+        }
+    }
+}
+</script>
+```
 
+返回的 html 中，createdData 被渲染成 "createdData changed!!!!!!!"
 
+（2）如果在 created 中异步更改数据，如下
 
+```
+...
+created(){
+         setTimeout(() => {
+             this.createdData = "createdData changed!!!!!!!"
+         },1000)
+        // this.createdData = "createdData changed!!!!!!!"
+    },
+...
+```
 
+返回的 html 中，createdData 被渲染成 "init data"，即不会等待异步返回
 
+（3）那如何在服务端渲染的时候，异步获取初始化数据（第一屏数据），并渲染给前端？
 
 
 

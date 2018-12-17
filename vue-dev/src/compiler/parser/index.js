@@ -113,7 +113,7 @@ export function parse (
   parseHTML(template, {
     warn,
     expectHTML: options.expectHTML,   // 布尔值，true
-    isUnaryTag: options.isUnaryTag,   // 是否是但元素标签，如<img />, <br />
+    isUnaryTag: options.isUnaryTag,   // 是否是单元素标签，如<img />, <br />
     canBeLeftOpenTag: options.canBeLeftOpenTag, // 是否是特殊标签，可以不封闭，如 <p>
     shouldDecodeNewlines: options.shouldDecodeNewlines,
     shouldDecodeNewlinesForHref: options.shouldDecodeNewlinesForHref,

@@ -28,11 +28,13 @@ const route = this.router.match(location, this.current)
 
 #### history模式与hash模式的区别
 
-（1）本质上来说没区别，hash模式默认也监听 popstate 事件，如果不支持才用 hashchange
+（1）SSR 只能用 history 模式
 
-（2）官方说法hash模式比较丑？所以可以选择history模式，没觉得那里丑
+（2）本质上来说没区别，hash模式默认也监听 popstate 事件，如果不支持才用 hashchange
 
-（3）要用history模式需要服务端配合，原因如下：
+（3）官方说法hash模式比较丑？所以可以选择history模式，没觉得那里丑
+
+（4）要用history模式需要服务端配合，原因如下：
 
 ```
 我们的应用是个单页客户端应用，如果后台没有正确的配置，

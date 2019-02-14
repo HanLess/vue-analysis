@@ -18,6 +18,9 @@
 
 以上只是能想到的大方向，在看源码的过程中一定会有新的问题，并且在看的过程中会把细碎的点连起来，解决完大方向后，再根据Vue的API文档，一个一个地去看实现，都完成后，vue的源码基本就读完了
 
+### 整体流程
+
+<img src="https://github.com/HanLess/vue-analysis/blob/master/flowImg/new-vue.png" />
 
 ### 主要问题的流程图如下
 

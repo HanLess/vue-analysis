@@ -187,9 +187,15 @@ export function createComponent (
 
   // extract listeners, since these needs to be treated as
   // child component listeners instead of DOM listeners
+  /**
+   * 自定义事件赋值给 listeners
+   */
   const listeners = data.on
   // replace with listeners with .native modifier
   // so it gets processed during parent component patch.
+  /**
+   * 组件上使用 .native 修饰符的事件
+   */
   data.on = data.nativeOn
 
   if (isTrue(Ctor.options.abstract)) {

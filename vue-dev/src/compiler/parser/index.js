@@ -113,7 +113,7 @@ export function parse (
   parseHTML(template, {
     warn,
     expectHTML: options.expectHTML,   // 布尔值，true
-    isUnaryTag: options.isUnaryTag,   // 是否是但元素标签，如<img />, <br />
+    isUnaryTag: options.isUnaryTag,   // 是否是单元素标签，如<img />, <br />
     canBeLeftOpenTag: options.canBeLeftOpenTag, // 是否是特殊标签，可以不封闭，如 <p>
     shouldDecodeNewlines: options.shouldDecodeNewlines,
     shouldDecodeNewlinesForHref: options.shouldDecodeNewlinesForHref,
@@ -627,8 +627,9 @@ function processAttrs (el) {
         }
       } else if (onRE.test(name)) {
 
-         // v-on 或 @ ，绑定事件在这里处理
-
+         /* v-on 或 @ ，绑定事件在这里处理，经过此处编译后，会把绑定的事件存在 AST 对象里，
+         经过后面的 generate 会生成可执行代码
+        */
         name = name.replace(onRE, '')
         addHandler(el, name, value, modifiers, false, warn)
       } else {

@@ -192,7 +192,7 @@ export function parseHTML (html, options) {
   * 分段分析输入的html文本，前进，跨过匹配到的字符串，如：<div>hello world</div>，匹配到 ‘<div’ ，
   * 则分割后 html = ‘>hello world</div>’
   * index = index + 4
-  *  *// 
+  *  */ 
   function advance (n) {
     index += n
     html = html.substring(n)

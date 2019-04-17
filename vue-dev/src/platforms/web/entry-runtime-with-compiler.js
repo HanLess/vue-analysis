@@ -33,7 +33,15 @@ Vue.prototype.$mount = function (
   // resolve template/el and convert to render function
   if (!options.render) {
     let template = options.template
+    /**
+     * 下面的 if elseif 判断了两种情况：
+     * （1）指定了 template 且 template 是 dom 元素
+     * （2）没有指定 template
+     */
     if (template) {
+      /**
+       * 指定了 tempalte ，但 template 是 dom 元素
+       */
       if (typeof template === 'string') {
         if (template.charAt(0) === '#') {
           template = idToTemplate(template)
@@ -54,6 +62,19 @@ Vue.prototype.$mount = function (
         return this
       }
     } else if (el) {
+      /**
+       * 在 new Vue() 时没有指定 template 的情况！！
+       * 这种情况在常规 vue 项目不多见（常规项目多如脚手架生成的那样）
+       * 
+       * 这里会取完整的 el 与其子元素，赋值给 template，如：
+       * el = `<div id="root">
+       *          <div>hello world<div>
+       *      </div>`
+       * 
+       * 则 template = el，在接下来的渲染中以 template 为模板
+       * 
+       * 与 react 有差异，在 react 中会清空 root 元素中的内容
+       */
       template = getOuterHTML(el)
     }
     if (template) {

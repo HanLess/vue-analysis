@@ -12,7 +12,7 @@ Vue.util.defineReactive(this, '_route', this._router.history.current)
 
 #### 路由跳转（由 transitionTo 实现）
 
-调用 router.push 或 router.replace 方法，都会走 this.transitionTo 方法，transitionTo 方法分析如下：
+调用 router.push 或 router.replace 方法，都会走 <strong>this.transitionTo</strong> 方法，transitionTo 方法分析如下：
 
 ```
 const route = this.router.match(location, this.current)

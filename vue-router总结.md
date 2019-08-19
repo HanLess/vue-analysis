@@ -20,6 +20,8 @@ const route = this.router.match(location, this.current)
 
 这里会用 match 方法找到需要展示的 route 对象，其中 location 是要跳转的路径，this.current 是当前展示的 route 对象，transitionTo 实际上也就是在切换 this.current，最后 route 的更改会触发vue实例中，this._route的改变
 
+#### vue rouer 的监听，跟 vue 响应式数据原理一样，通过设置 this._route 的 setter，getter 来触发视图的变化
+
 #### 组件切换，重要！
 
 \<router-view\>组件中：

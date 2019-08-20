@@ -22,6 +22,10 @@ const route = this.router.match(location, this.current)
 
 #### vue rouer 的监听，跟 vue 响应式数据原理一样，通过设置 this._route 的 setter，getter 来触发视图的变化
 
+#### 监听路由的变化
+
+通过 <router-link> 跳转，或者直接调用 router.push，可以直接走 vue router 的监听逻辑，阻止 <a> 的默认行为等，如果用js控制，或直接用 <a> 跳转，会走如下逻辑：（1）html5 模式会刷新页面，根据路由信息来渲染页面（2）hash 模式会监听 hashchange 事件
+
 #### 组件切换，重要！
 
 \<router-view\>组件中：

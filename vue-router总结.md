@@ -24,7 +24,9 @@ const route = this.router.match(location, this.current)
 
 #### 监听路由的变化
 
-通过 <router-link> 跳转，或者直接调用 router.push，可以直接走 vue router 的监听逻辑，阻止 <a> 的默认行为等，如果用js控制，或直接用 <a> 跳转，会走如下逻辑：（1）html5 模式会刷新页面，根据路由信息来渲染页面（2）hash 模式会监听 hashchange 事件
+通过 <router-link> 跳转，或者直接调用 router.push，可以直接走 vue router 的监听逻辑，阻止 <a> 的默认行为等，如果用js控制，或直接用 <a> 跳转，会走如下逻辑：（1）html5 模式会刷新页面，根据路由信息来渲染页面（2）hash 模式会监听 popstate 或 hashchange 事件
+  
+### location.href = '#/one' 修改 hash，也会触发 popstate 事件！！！
 
 #### 组件切换，重要！
 

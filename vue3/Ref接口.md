@@ -11,8 +11,6 @@ interface Ref<T = any> {
 
 利用 symbol 指定一个唯一的 key，用 value 存数据
 
-
-
 ```
 // 递归地获取嵌套数据的类型
 // Recursively unwraps nested value bindings.
@@ -37,3 +35,7 @@ export type UnwrapRef<T> = {
 // 它是这样的类型：如果该类型已经继承于Ref，则不需要解套，否则可能是嵌套的ref，走递归解套
 export type UnwrapNestedRefs<T> = T extends Ref ? T : UnwrapRef<T>
 ```
+
+#### 对于 Ref 的解释
+
+Ref是这样的一种数据结构：它有个key为Symbol的属性做类型标识，有个属性value用来存储数据。这个数据可以是任意的类型，唯独不能是被嵌套了Ref类型的类型。

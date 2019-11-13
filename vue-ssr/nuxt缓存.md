@@ -73,6 +73,17 @@ await this.setupMiddleware()
 （3）nuxtMiddleware 是什么？以下是代码片段
 
 ```
+const result = await renderRoute(url, context)
+
+...
+
+const {
+  html,
+  cspScriptSrcHashes,
+  error,
+  redirected,
+  preloadFiles
+} = result
 
 ...
 
@@ -86,6 +97,11 @@ await this.setupMiddleware()
 
 ```
 
-可
+可以发现，nuxtMiddleware 里返回了 ssr 的最终结果：首屏内容
+
+可以得到结论：serverMiddleware 可以在 nuxtMiddleware 执行 render 前，拦截这个请求，返回缓存内容，这个请求也就不会执行 render 逻辑了
+
+
+
 
 

@@ -101,7 +101,9 @@ const {
 
 可以得到结论：serverMiddleware 可以在 nuxtMiddleware 执行 render 前，拦截这个请求，返回缓存内容，这个请求也就不会执行 render 逻辑了
 
+#### 怎么获取首屏内容
 
+可以使用 nuxt hooks，hooks 很多，具体看文档或源码，这里可以使用 render:route 来获取 result.html
 
 
 

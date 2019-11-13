@@ -38,8 +38,54 @@ nuxt 中的中间件分为两种
 
 在 vue-render 前调用，跟 koa 中间件类似，可以直接 res.end 返回缓存内容
 
-### nuxt 中
-在 vue-render 前调用，跟 koa 中间件类似，可以直接 res.end 返回缓存内容的
-在 vue-render 前调用，跟 koa 中间件类似，可以直接 res.end 返回缓存内容
+### nuxt 中的缓存，就是在 serverMiddleware 中做
+
+nuxt 中的 serverMiddleware 源码如下：
+
+
+（1）server.js 执行 ready 方法，会执行 setupMiddleware()
+
+```
+await this.setupMiddleware()
+```
+
+（2）setupMiddleware 中会设置 connect 的中间件，connect 可以理解为轻量的 koa
+
+```
+// Add user provided middleware
+  for (const m of this.options.serverMiddleware) {
+    this.useMiddleware(m)
+  }
+  
+  ...
+  
+  // Finally use nuxtMiddleware
+  this.useMiddleware(nuxtMiddleware({
+    options: this.options,
+    nuxt: this.nuxt,
+    renderRoute: this.renderRoute.bind(this),
+    resources: this.resources
+  }))
+```
+
+可以看到，是先设置 serverMiddleware 中间件，最后设置 nuxtMiddleware，即 serverMiddleware 将会先执行
+
+（3）nuxtMiddleware 是什么？以下是代码片段
+
+```
+
+...
+
+// Send response
+  res.setHeader('Content-Type', 'text/html; charset=utf-8')
+  res.setHeader('Accept-Ranges', 'none') // #3870
+  res.setHeader('Content-Length', Buffer.byteLength(html))
+  res.end(html, 'utf8')
+
+...
+
+```
+
+可
 
 

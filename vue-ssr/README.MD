@@ -14,3 +14,18 @@ nuxt 提供了一套 vue ssr 的工程化脚手架，在工程中主要注意三
 
 
 #### source map 的生成
+
+nuxt.config.js 里提供了自定义 webpack 打包配置的选项，devtool = 'source-map' 可以为每一个打包的文件生成 source-map
+
+```
+build: {
+    /*
+    ** You can extend webpack config here
+    */
+    extend (config, { isClient }) {
+      if (isClient) {
+        config.devtool = 'source-map'
+      }
+    }
+  }
+```

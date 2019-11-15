@@ -11,3 +11,6 @@ nuxt 提供了一套 vue ssr 的工程化脚手架，在工程中主要注意三
 在 nuxt.config.js 里，可以在 build.publicPath 指定 cdn 的域名、路径
 
 #### 服务端给前端传值（store同步传值）
+
+
+#### source map 的生成

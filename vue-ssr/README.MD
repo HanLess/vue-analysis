@@ -12,6 +12,34 @@ nuxt 提供了一套 vue ssr 的工程化脚手架，在工程中主要注意三
 
 #### 服务端给前端传值（store同步传值）
 
+nuxt 提供了 nuxtServerInit 方法，可以把服务端数据直接传给 vuex
+
+store/index.js 中
+
+```
+export const actions = {
+    nuxtServerInit ({ commit }, { req }) {
+        console.log(req.data)
+        commit('changeTest', req.data);
+    }
+}
+```
+
+server/index.js 中
+
+```
+app.use((ctx) => {
+    // console.log('bingo')
+    ctx.status = 200
+    ctx.respond = false 
+    ctx.req.ctx = ctx 
+    ctx.req.data = 'hello world hanhongxuan'
+    nuxt.render(ctx.req, ctx.res)
+  })
+```
+
+即可在 vue 组件中使用 state 中的数据。但这里有个问题，nuxtServerInit 只能写在 store 顶层的 actions 中，不能写在模块里，当某个模块的数据为首屏展示数据时，需要二次赋值，不过问题不大
+
 
 #### source map 的生成
 

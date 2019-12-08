@@ -40,6 +40,8 @@ vue类的实现:
 
 数据响应流程:
 
+更正：nextTick 使页面异步渲染，防止阻塞主线程；但数据的更新是同步的（data的变化），可以立即生效，这里跟 react 有区别，react 是数据更新和渲染都是异步的
+
 <img src="https://github.com/HanLess/vue-analysis/blob/master/flowImg/%E6%95%B0%E6%8D%AE%E5%93%8D%E5%BA%94%E6%B5%81%E7%A8%8B.png" />
 
 组件的更新（vnode的更新）:

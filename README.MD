@@ -18,6 +18,8 @@
 
 以上只是能想到的大方向，在看源码的过程中一定会有新的问题，并且在看的过程中会把细碎的点连起来，解决完大方向后，再根据Vue的API文档，一个一个地去看实现，都完成后，vue的源码基本就读完了
 
+vue2 中数组监听：对象数组，直接用下标修改是可以监听的，基础类型数组无法监听，具体逻辑看源码中： defineReactive -> dependArray
+
 ### 整体流程
 
 <img src="https://github.com/HanLess/vue-analysis/blob/master/flowImg/new-vue.png" />
